@@ -1,0 +1,97 @@
+body {
+    background-color: white;
+  }
+  
+  .game-board {
+    margin-top: 50px;
+  }
+  
+  .game-row {
+    height: 32px;
+    margin-bottom: 10px;
+  }
+  
+  .game-cell {
+    height: 32px;
+    width: 32px;
+    background-color: #cccccc;
+  
+    display: inline-block;
+    border: solid 1px #888888;
+    margin-right: 10px;
+  
+    position: relative;
+  
+    outline-style: solid;
+    outline-color: #888888;
+  }
+  
+  .game-cell.mine {
+    background-image: url("/mine.jpg");
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .game-cell.flag {
+    background-image: url("/flag.png");
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .game-cell.filled {
+    cursor: pointer;
+    border-top-color: white;
+    border-left-color: white;
+    outline-color: #888888;
+
+    border-width: 4px;
+  }
+  
+  .game-cell.filled:hover {
+    cursor: pointer;
+    border-width: 5px;
+  }
+  
+  .game-cell .cell-value {
+    position: absolute;
+  
+    top: 0px;
+    left: 9px;
+    
+    font-size: 18px;
+    font-weight: bold;
+  
+    -webkit-text-stroke: 0.5px #44444477;
+  }
+  
+  .cell-value.num-1 {
+    color: blue;
+  }
+  
+  .cell-value.num-2 {
+    color: green;
+  }
+  
+  .cell-value.num-3 {
+    color: red;
+  }
+  
+  .cell-value.num-4 {
+    color: darkblue;
+  }
+  
+  .cell-value.num-5 {
+    color: darkred;
+  }
+  
+  .cell-value.num-6 {
+    color: darkturquoise;
+  }
+  
+  .cell-value.num-7 {
+    color: black;
+  }
+  
+  .cell-value.num-8 {
+    color: darkgray;
+  }
