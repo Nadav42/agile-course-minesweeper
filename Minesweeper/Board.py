@@ -104,10 +104,10 @@ class Cell:
 
 class Board:
 
-    def __init__(self):
+    def __init__(self, rows=9, cols=9):
 
-        self.rows = 9
-        self.cols = 9
+        self.rows = rows
+        self.cols = cols
 
         self.game_over = False
         self.mine_probability = 0.13 # this is the difficulty
@@ -143,6 +143,10 @@ class Board:
         cell = self.get_cell(row, col)
 
         if cell is not None:
+
+            # block clicks on flagged cells
+            if cell.has_flag:
+                return
 
             if cell.get_has_mine():
                 self.finish_game(mine=True)
@@ -183,11 +187,12 @@ class Board:
         current_mines = 0
 
         while current_mines < mines_to_place:
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    if current_mines < mines_to_place and random.random() <= self.mine_probability:
-                        self.cells[i][j].has_mine = True
-                        current_mines = current_mines + 1
+            row = random.randint(0, self.rows - 1)
+            col = random.randint(0, self.cols - 1)
+
+            self.get_cell(row, col).has_mine = True
+
+            current_mines = current_mines + 1
 
         print("\nplaced {} mines on board\n".format(current_mines))
 
@@ -199,6 +204,9 @@ class Board:
 
         if won:
             print("you win!")
+
+    def is_game_over(self):
+        return self.game_over
 
     def __str__(self):
         board_str = ""
@@ -219,13 +227,23 @@ class Board:
 
 if __name__ == '__main__':
 
-    board = Board()
+    board = Board(rows=5, cols=5)
 
-    board.cells[0][3].has_mine = True
-    board.click(0, 0)
-    board.click(0, 4)
-    board.flag_click(0, 3)
+    while not board.is_game_over():
+        print(board)
 
-    print(board)
+        input_str = input()
+        row = int(input_str[0])
+        col = int(input_str[2])
+
+        if input_str[1].lower() == 'f':
+            board.flag_click(row, col)
+        else:
+            board.click(row, col)
+
+    # board.cells[0][3].has_mine = True
+    # board.click(0, 0)
+    # board.click(0, 4)
+    # board.flag_click(0, 3)
 
     #board.cells[0][0].print_cells_around()
