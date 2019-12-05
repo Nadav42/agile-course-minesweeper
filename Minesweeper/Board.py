@@ -1,5 +1,10 @@
 import random
 
+# enum
+GAME_NOT_FINISHED = 0
+GAME_WON = 1 # cleared all mines
+GAME_LOST = 2 # clicked a mine
+
 class Cell:
 
     def __init__(self):
@@ -69,7 +74,8 @@ class Cell:
                     cell.click()
 
     def flag_click(self):
-        self.has_flag = not self.has_flag
+        if not self.clicked:
+            self.has_flag = not self.has_flag
 
     def get_has_mine(self):
         return self.has_mine
@@ -92,7 +98,7 @@ class Cell:
         if self.has_flag:
             return "F"
 
-        # remove this
+        # remove this (print cheats)
         if self.has_mine:
             return "M"
 
@@ -105,20 +111,26 @@ class Cell:
 class Board:
 
     def __init__(self, rows=9, cols=9):
+        self.mine_probability = 0.13 # this is the difficulty
 
+        # load the board
+        self.reset(rows=rows, cols=cols)
+
+    def reset(self, rows=9, cols=9):
         self.rows = rows
         self.cols = cols
 
-        self.game_over = False
-        self.mine_probability = 0.13 # this is the difficulty
+        self.game_over = GAME_NOT_FINISHED
 
+        # cell objects
         self.cells = [[0 for col in range(self.cols)] for row in range(self.rows)]
 
+        # init cells
         for i in range(self.rows):
             for j in range(self.cols):
                 self.cells[i][j] = Cell()
 
-        # separated because might not be defined yet
+        # link cells, separated because might not be defined yet.
         for i in range(self.rows):
             for j in range(self.cols):
                 self.cells[i][j].up = self.get_cell(i - 1, j)
@@ -126,6 +138,7 @@ class Board:
                 self.cells[i][j].down = self.get_cell(i + 1, j)
                 self.cells[i][j].left = self.get_cell(i, j - 1)
 
+        # init mines
         self.place_mines()
 
     def get_cell(self, row, col):
@@ -197,15 +210,16 @@ class Board:
         print("\nplaced {} mines on board\n".format(current_mines))
 
     def finish_game(self, mine=False, won=False):
-        self.game_over = True
 
         if mine:
+            self.game_over = GAME_LOST
             print("game over! you lose")
 
         if won:
+            self.game_over = GAME_WON
             print("you win!")
 
-    def is_game_over(self):
+    def get_game_status(self):
         return self.game_over
 
     def __str__(self):
@@ -229,7 +243,7 @@ if __name__ == '__main__':
 
     board = Board(rows=5, cols=5)
 
-    while not board.is_game_over():
+    while board.get_game_status() == GAME_NOT_FINISHED:
         print(board)
 
         input_str = input()

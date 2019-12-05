@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS, cross_origin
 
+from GameManager import GameManager
 from WebServices.Routing import Routing
 
 app = Flask(__name__)
@@ -18,8 +19,11 @@ app.static_url_path="/react/build/static"
 app.static_folder=app.root_path + app.static_url_path
 print("changed flask static folder to:", app.static_url_path)
 
+# init GameManager
+gameManager = GameManager()
+
 # add flask routes and endpoints in Routing
-Routing(app, api)
+Routing(app, api, gameManager)
 
 # Serve React App
 @app.route('/', defaults={'path': ''})

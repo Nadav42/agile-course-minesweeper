@@ -4,6 +4,9 @@ import traceback
 
 class ExampleList(Resource):
 
+    def __init__(self, gameManager):
+        self.gameManager = gameManager
+
     def get(self):
 
         response = [
@@ -14,12 +17,14 @@ class ExampleList(Resource):
             {"name": "file5", "num": 5157}
         ]
 
+        # response = {"str": str(self.gameManager.board)}
+
         return response
 
 class ExampleService:
 
-    def __init__(self, app, api):
+    def __init__(self, app, api, gameManager):
 
         # add rest endpoints
-        api.add_resource(ExampleList, '/api/list/getlists')
+        api.add_resource(ExampleList, '/api/list/getlists', resource_class_kwargs={'gameManager': gameManager})
 
