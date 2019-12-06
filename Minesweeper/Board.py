@@ -170,6 +170,9 @@ class Board:
 
     def click(self, row, col):
 
+        if self.get_game_status() != GAME_NOT_FINISHED:
+            return
+
         cell = self.get_cell(row, col)
 
         if cell is not None:
@@ -186,6 +189,9 @@ class Board:
                 self.check_win()
 
     def flag_click(self, row, col):
+
+        if self.get_game_status() != GAME_NOT_FINISHED:
+            return
 
         cell = self.get_cell(row, col)
 

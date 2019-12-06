@@ -13,8 +13,9 @@ class Fetch(Resource):
 
 
 class Click(Resource):
-    def __init__(self, gameManager):
+    def __init__(self, gameManager, socket_io):
         self.gameManager = gameManager
+        self.socket_io = socket_io
 
     def post(self):
         body = request.get_json()
@@ -30,12 +31,15 @@ class Click(Resource):
         row = int(body["row"])
 
         self.gameManager.click(row, col)
+
+        self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "clicked"}
 
 
 class Flag(Resource):
-    def __init__(self, gameManager):
+    def __init__(self, gameManager, socket_io):
         self.gameManager = gameManager
+        self.socket_io = socket_io
 
     def post(self):
         body = request.get_json()
@@ -51,12 +55,15 @@ class Flag(Resource):
         row = int(body["row"])
 
         self.gameManager.flag_click(row, col)
+
+        self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "flag clicked"}
 
 
 class Reset(Resource):
-    def __init__(self, gameManager):
+    def __init__(self, gameManager, socket_io):
         self.gameManager = gameManager
+        self.socket_io = socket_io
 
     def post(self):
         body = request.get_json()
@@ -72,15 +79,17 @@ class Reset(Resource):
         rows = int(body["rows"])
 
         self.gameManager.reset_game(rows=rows, cols=cols)
+
+        self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "board reset"}
 
 
 class BoardService:
-    def __init__(self, app, api, gameManager):
+    def __init__(self, app, api, socket_io, gameManager):
 
         # add rest endpoints
         api.add_resource(Fetch, '/api/board/fetch', resource_class_kwargs={'gameManager': gameManager})
-        api.add_resource(Click, '/api/board/click', resource_class_kwargs={'gameManager': gameManager})
-        api.add_resource(Flag, '/api/board/flag', resource_class_kwargs={'gameManager': gameManager})
-        api.add_resource(Reset, '/api/board/reset', resource_class_kwargs={'gameManager': gameManager})
+        api.add_resource(Click, '/api/board/click', resource_class_kwargs={'gameManager': gameManager, 'socket_io': socket_io})
+        api.add_resource(Flag, '/api/board/flag', resource_class_kwargs={'gameManager': gameManager, 'socket_io': socket_io})
+        api.add_resource(Reset, '/api/board/reset', resource_class_kwargs={'gameManager': gameManager, 'socket_io': socket_io})
 

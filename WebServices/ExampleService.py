@@ -23,7 +23,7 @@ class ExampleList(Resource):
 
 class ExampleService:
 
-    def __init__(self, app, api, gameManager):
+    def __init__(self, app, api, socketio, gameManager):
 
         # add rest endpoints
         api.add_resource(ExampleList, '/api/list/getlists', resource_class_kwargs={'gameManager': gameManager})

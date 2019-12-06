@@ -1,5 +1,7 @@
 import React from 'react';
-import { getMinesweeperBoard, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
+import socketIOClient from "socket.io-client";
+
+import { url, getMinesweeperBoard, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
 
 function CellMine(props) {
     return (
@@ -128,13 +130,39 @@ function Row(props) {
     //     <CellFlag></CellFlag>
 }
 
+function GameFinishMessage(props) {
+    let finished = props.finished;
+    let won = props.won;
+
+    if (!finished) {
+        return null;
+    }
+
+    if (won) {
+        return <h3 className="text-success">You win!</h3>
+    }
+    else {
+        return <h3 className="text-danger">You lost!</h3>
+    }
+}
+
 class Board extends React.Component {
     state = { boardData: null }
 
     constructor(props) {
         super(props);
 
+        this.socket = socketIOClient(url);
+    }
+
+	componentDidMount() {
         this.updateBoardData();
+ 
+        this.socket.on("boardChanged", this.updateBoardData);
+    }
+
+    componentWillUnmount() {
+        this.socket.off("boardChanged", this.updateBoardData);
     }
 
     updateBoardData = async () => {
@@ -182,9 +210,9 @@ class Board extends React.Component {
                     {rowElements}
                 </div>
 
-                <button type="button" className="btn btn-secondary mt-4" onClick={this.handleBoardReset}>Reset Game</button>
-                <p>Finished: {String(boardData.finished)}</p>
-                <p>Game Won: {String(boardData.won)}</p>
+                <div className="mb-4"></div>
+                <GameFinishMessage finished={boardData.finished} won={boardData.won}/>
+                <button type="button" className="btn btn-secondary" onClick={this.handleBoardReset}>Reset Game</button>
             </div>
         );
     }

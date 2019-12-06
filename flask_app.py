@@ -1,18 +1,27 @@
 import os
 
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_restful import Resource, Api, reqparse
-from flask_cors import CORS, cross_origin
+# from flask_cors import CORS, cross_origin
 
+from flask_socketio import SocketIO
+
+from Config import SHOULD_BIND_ADRESS, SCRIPT_PATH
 from GameManager import GameManager
 from WebServices.Routing import Routing
 
 app = Flask(__name__)
-cors = CORS(app)
+
+socketio = SocketIO(async_mode="eventlet")
+socketio.init_app(app, cors_allowed_origins=["http://localhost:3000"], async_mode="eventlet")
+
 api = Api(app)
 
-app.debug = True
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
+app.config['SECRET_KEY'] = 'Az5Jf$y1cSt'
 
 # change static folder to react build folder
 app.static_url_path="/react/build/static"
@@ -23,14 +32,14 @@ print("changed flask static folder to:", app.static_url_path)
 gameManager = GameManager()
 
 # add flask routes and endpoints in Routing
-Routing(app, api, gameManager)
+Routing(app, api, socketio, gameManager)
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
-    python_static_folder = "./static"
-    react_static_folder = "./react/build"
+    python_static_folder = "{}/static".format(SCRIPT_PATH)
+    react_static_folder = "{}/react/build".format(SCRIPT_PATH)
 
     # to make this work you need to:
     # 1. put react's build folder in python home folder
@@ -59,4 +68,8 @@ def after_request(response):
     return response
 
 if __name__ == '__main__':
-    app.run(port='5000', debug=True)  # blocking
+
+    if SHOULD_BIND_ADRESS:
+        socketio.run(app, host="0.0.0.0", port='5000')
+    else:
+        socketio.run(app, port='5000', debug=True)
