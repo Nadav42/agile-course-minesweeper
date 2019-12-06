@@ -101,7 +101,7 @@ body {
 }
 
 .flag-mode-container {
-  position: absolute;
+  position: fixed;
   right: 0px;
   bottom: 0px;
 
