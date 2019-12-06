@@ -91,23 +91,29 @@ function Row(props) {
     for (let i = 0; i < rowData.length; i++) {
         let cellData = rowData[i];
 
+        // mark data
+        let flag = false;
+        let flat = false;
+        let mine = false;
+        let number = undefined;
+
         if (!cellData.clicked && cellData.flag) {
-            cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} flag />)
+            flag = true;
         }
         else if (cellData.clicked && cellData.adjacentMines !== undefined) {
             if (cellData.adjacentMines > 0) {
-                cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} number={cellData.adjacentMines} />)
+                number = cellData.adjacentMines;
             }
             else {
-                cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} flat />)
+                flat = true; // number = 0 => show flat cell
             }
         }
         else if (cellData.mine) {
-            cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} mine />)
+            mine = true;
         }
-        else {
-            cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} />)
-        }
+
+        // add cell
+        cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} flag={flag} flat={flat} mine={mine} number={number} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} />)
     }
 
     return (
