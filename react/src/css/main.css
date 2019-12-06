@@ -110,6 +110,8 @@ body {
 
   border: solid 1px #cccccc;
   cursor: pointer;
+
+  background-color: #fcfcfc;
 }
 
 .flag-mode-container.active {

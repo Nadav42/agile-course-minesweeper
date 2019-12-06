@@ -11,14 +11,26 @@ function CellMine(props) {
 }
 
 function CellFlag(props) {
-    const flagClick = (e) => {
+
+    // in flag mode normal click calls flag click
+    const flagModeClick = () => {
+        props.handleCellClick(props.rowNum, props.colNum);
+    }
+
+    // right click (or hold in android)
+    const flagRightClick = (e) => {
         props.handleCellFlagClick(props.rowNum, props.colNum);
         e.preventDefault();
     }
 
-    return (
-        <div className="game-cell flag" onContextMenu={flagClick}></div>
-    );
+    if (props.flagMode) {
+        return <div className="game-cell flag" onClick={flagModeClick}></div>;
+    }
+    else {
+        return <div className="game-cell flag" onContextMenu={flagRightClick}></div>;
+    }
+
+
 }
 
 function CellNumber(props) {
@@ -64,7 +76,7 @@ function Cell(props) {
         return <CellNumber number={props.number} />;
     }
     else if (props.flag) {
-        return <CellFlag rowNum={props.rowNum} colNum={props.colNum} handleCellFlagClick={props.handleCellFlagClick} />;
+        return <CellFlag rowNum={props.rowNum} colNum={props.colNum} handleCellClick={props.handleCellClick} handleCellFlagClick={props.handleCellFlagClick} flagMode={props.flagMode} />;
     }
     else if (props.mine) {
         return <CellMine />;
@@ -115,7 +127,7 @@ function Row(props) {
         }
 
         // add cell
-        cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} flag={flag} flat={flat} mine={mine} number={number} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} />)
+        cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} flag={flag} flat={flat} mine={mine} number={number} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} flagMode={props.flagMode} />)
     }
 
     return (
@@ -194,7 +206,7 @@ class Board extends React.Component {
             this.handleCellFlagClick(row, col);
             return;
         }
-        
+
         // normal click
         postBoardClick(row, col, this.updateBoardData);
     }
@@ -228,7 +240,7 @@ class Board extends React.Component {
         let rowElements = []
 
         for (let i = 0; i < board.length; i++) {
-            rowElements.push(<Row key={`row-${i}`} rowNum={i} rowData={board[i]} handleCellClick={this.handleCellClick} handleCellFlagClick={this.handleCellFlagClick} />)
+            rowElements.push(<Row key={`row-${i}`} rowNum={i} rowData={board[i]} handleCellClick={this.handleCellClick} handleCellFlagClick={this.handleCellFlagClick} flagMode={this.state.flagMode} />)
         }
 
         return (
