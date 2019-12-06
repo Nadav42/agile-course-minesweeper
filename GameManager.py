@@ -27,8 +27,8 @@ class GameManager:
     def flag_click(self, row, col):
         self.board.flag_click(row, col)
 
-    def reset_game(self):
-        self.board.reset()
+    def reset_game(self, rows=9, cols=9):
+        self.board.reset(rows, cols)
 
     # return to user something like
     # {board: gameManager.get_board(), gameStatus: gameManager.game_status()}
