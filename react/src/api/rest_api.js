@@ -1,13 +1,12 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 
 let browserCurrentUrl = window.location.href;
-let apiUrl = "production url"
+let host = browserCurrentUrl.split("/")[2];
+host = host.split(":")[0];
 
-// dev mode
-if (browserCurrentUrl.indexOf("http://localhost") >= 0) {
-    apiUrl = "http://localhost:5000"
-}
+let apiUrl = `http://${host}:5000`
+console.log(host, apiUrl)
 
 export let url = apiUrl;
 
@@ -16,10 +15,15 @@ let api = axios.create({
     baseURL: url
 });
 
-// get 
-export const getData = async () => {
+// GET REQUEST Helper
+const get = async (endpointUrl, params) => {
+
+    if (!params) {
+        params = {};
+    }
+
     try {
-        const response = await api.get(`${url}/api/data/getall`, { withCredentials: true });
+        const response = await api.get(`${url}${endpointUrl}`, { withCredentials: true, params: params });
         return response.data;
     }
     catch (error) {
@@ -29,22 +33,37 @@ export const getData = async () => {
     return null;
 }
 
-// POST
-
-export const postNewData = (body1, body2, callback) => {
-
-    api.post(`${url}/api/data/postdata`, {
-        body1: body1,
-        body2: body2
-    }, { withCredentials: true })
+// POST REQUEST Helper
+const post = async (endpointUrl, bodyData, callback) => {
+    api.post(`${url}${endpointUrl}`, bodyData, { withCredentials: true })
         .then((response) => {
-            // console.log(response);
-            toast.success("successfuly")
-            callback();
+            if (callback) {
+                callback();
+            }
         }, (error) => {
             console.log(error);
         });
+}
 
+// ---------- api ---------- //
+
+// get board
+export const getMinesweeperBoard = async () => {
+    return await get("/api/board/fetch");
+}
+
+// usage examples
+export const postStartMcts = (searchesPerMove, callback) => {
+    let body = {
+        searchesPerMove: searchesPerMove
+    };
+
+    post("/api/mcts/start", body, "Starting MCTS", callback);
+}
+
+// post example
+export const getBenchmarkEnginesList = async () => {
+    return await get("/api/benchmark/engines");
 }
 
 export default api;

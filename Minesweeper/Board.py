@@ -106,7 +106,7 @@ class Cell:
 
     def to_json(self, reveal_mines=False):
 
-        # {"clicked": ..., "flag": ..., "mine": ..., "value": ...}
+        # {"clicked": ..., "flag": ..., "mine": ..., "adjacentMines": ...}
         json_dic = {"clicked": self.clicked, "flag": self.has_flag}
 
         if reveal_mines:

@@ -47,5 +47,16 @@ def serve(path):
     # else return react app index
     return send_from_directory(react_static_folder, "index.html")
 
+@app.after_request
+def after_request(response):
+
+    if 'HTTP_ORIGIN' in request.environ:
+        response.headers.add('Access-Control-Allow-Origin', request.environ['HTTP_ORIGIN'])
+
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
 if __name__ == '__main__':
     app.run(port='5000', debug=True)  # blocking

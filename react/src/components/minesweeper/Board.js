@@ -1,4 +1,5 @@
 import React from 'react';
+import { getMinesweeperBoard } from '../../api/rest_api'
 
 function CellMine(props) {
     return (
@@ -48,34 +49,80 @@ function Cell(props) {
 function Row(props) {
     let cells = [];
 
-    for (let i = 0; i < props.cols; i++) {
-        cells.push(<Cell key={`col-${i}`} number={i + 1} />)
+    if (!props.rowData) {
+        return null;
+    }
+
+    // {"clicked": ..., "flag": ..., "mine": ..., "adjacentMines": ...}
+    let rowData = props.rowData;
+
+    for (let i = 0; i < rowData.length; i++) {
+        let cellData = rowData[i];
+
+        if (!cellData.clicked && cellData.flag) {
+            cells.push(<Cell key={`col-${i}`} flag />)
+        }
+        else if (cellData.clicked && cellData.adjacentMines !== undefined) {
+            if (cellData.adjacentMines > 0) {
+                cells.push(<Cell key={`col-${i}`} number={cellData.adjacentMines} />)
+            }
+            else {
+                cells.push(<Cell key={`col-${i}`} flat />)
+            }  
+        }
+        else if (cellData.mine) {
+            cells.push(<Cell key={`col-${i}`} mine />)
+        }
+        else {
+            cells.push(<Cell key={`col-${i}`} />)
+        }
+        
     }
 
     return (
         <div className="game-row">
             {cells}
-            <Cell></Cell>
-            <Cell flat></Cell>
-            <CellMine></CellMine>
-            <CellFlag></CellFlag>
         </div>
     );
+
+    // <Cell></Cell>
+    //     <Cell flat></Cell>
+    //     <CellMine></CellMine>
+    //     <CellFlag></CellFlag>
 }
 
 class Board extends React.Component {
+    state = { boardData: null }
+
     constructor(props) {
         super(props);
+
+        this.updateBoardData();
+    }
+
+    updateBoardData = async () => {
+        let data = await getMinesweeperBoard();
+        this.setState({ boardData: data });
+
+
+        console.log(this.state);
     }
 
     render() {
         let rows = this.props.rows;
         let cols = this.props.cols;
 
+        if (!this.state.boardData || !this.state.boardData.board) {
+            return null;
+        }
+
+        let boardData = this.state.boardData;
+        let board = boardData.board;
+
         let rowElements = []
 
-        for (let i = 0; i < rows; i++) {
-            rowElements.push(<Row key={`row-${i}`} cols={cols} />)
+        for (let i = 0; i < board.length; i++) {
+            rowElements.push(<Row key={`row-${i}`} rowData={board[i]} />)
         }
 
         return (
