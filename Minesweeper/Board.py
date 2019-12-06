@@ -106,7 +106,7 @@ class Cell:
 
     def to_json(self, reveal_mines=False):
 
-        # {"clicked": ..., "flag": ..., "mine": ..., "value": ...}
+        # {"clicked": ..., "flag": ..., "mine": ..., "adjacentMines": ...}
         json_dic = {"clicked": self.clicked, "flag": self.has_flag}
 
         if reveal_mines:
@@ -202,7 +202,7 @@ class Board:
                 if not cell.clicked and not cell.has_mine:
                     won = False
 
-                if cell.has_mine and not cell.has_flag:
+                if cell.has_mine and cell.clicked:
                     won = False
 
         if won:
@@ -257,7 +257,7 @@ class Board:
 
         reveal_mines = False
 
-        if self.get_game_status() == GAME_LOST:
+        if self.get_game_status() == GAME_LOST or self.get_game_status() == GAME_WON:
             reveal_mines = True
 
         for i in range(self.rows):

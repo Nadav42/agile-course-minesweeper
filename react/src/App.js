@@ -20,7 +20,7 @@ class App extends React.Component {
 					<h1>Minesweeper</h1>
 				</div>
 				<div className="container text-center mx-auto">
-					<Board rows={8} cols={8} />
+					<Board rows={9} cols={9} />
 				</div>
 			</div>
 		);

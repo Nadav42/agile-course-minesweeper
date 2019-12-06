@@ -1,4 +1,5 @@
 import React from 'react';
+import { getMinesweeperBoard, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
 
 function CellMine(props) {
     return (
@@ -8,9 +9,13 @@ function CellMine(props) {
 }
 
 function CellFlag(props) {
+    const flagClick = (e) => {
+        props.handleCellFlagClick(props.rowNum, props.colNum);
+        e.preventDefault();
+    }
+
     return (
-        <div className="game-cell flag">
-        </div>
+        <div className="game-cell flag" onContextMenu={flagClick}></div>
     );
 }
 
@@ -24,63 +29,156 @@ function CellNumber(props) {
     );
 }
 
+function FlatCell(props) {
+    return (
+        <div className="game-cell"></div>
+    );
+}
+
+function ClickableCell(props) {
+    const cellClick = () => {
+        props.handleCellClick(props.rowNum, props.colNum);
+    }
+
+    const flagClick = (e) => {
+        props.handleCellFlagClick(props.rowNum, props.colNum);
+        e.preventDefault();
+    }
+
+    return (
+        <div className="game-cell filled" onClick={cellClick} onContextMenu={flagClick}></div>
+    );
+}
+
 function Cell(props) {
+    let rowNum = props.rowNum;
+    let colNum = props.colNum;
+
+    if (rowNum === undefined || colNum === undefined) {
+        return null;
+    }
+
     if (props.number) {
         return <CellNumber number={props.number} />;
     }
     else if (props.flag) {
-        return <CellFlag />;
+        return <CellFlag rowNum={props.rowNum} colNum={props.colNum} handleCellFlagClick={props.handleCellFlagClick} />;
     }
     else if (props.mine) {
         return <CellMine />;
     }
 
-    let cellClass = " filled";
     if (props.flat) {
-        cellClass = "";
+        return <FlatCell />;
     }
 
-    return (
-        <div className={`game-cell ${cellClass}`}></div>
-    );
+    return <ClickableCell rowNum={props.rowNum} colNum={props.colNum} handleCellClick={props.handleCellClick} handleCellFlagClick={props.handleCellFlagClick} />;
 }
 
 function Row(props) {
     let cells = [];
 
-    for (let i = 0; i < props.cols; i++) {
-        cells.push(<Cell key={`col-${i}`} number={i + 1} />)
+    if (!props.rowData || props.rowNum === undefined) {
+        return null;
+    }
+
+    // {"clicked": ..., "flag": ..., "mine": ..., "adjacentMines": ...}
+    let rowData = props.rowData;
+    let rowNum = props.rowNum;
+    let handleCellClick = props.handleCellClick;
+    let handleCellFlagClick = props.handleCellFlagClick;
+
+    for (let i = 0; i < rowData.length; i++) {
+        let cellData = rowData[i];
+
+        if (!cellData.clicked && cellData.flag) {
+            cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} flag />)
+        }
+        else if (cellData.clicked && cellData.adjacentMines !== undefined) {
+            if (cellData.adjacentMines > 0) {
+                cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} number={cellData.adjacentMines} />)
+            }
+            else {
+                cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} flat />)
+            }
+        }
+        else if (cellData.mine) {
+            cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} mine />)
+        }
+        else {
+            cells.push(<Cell key={`col-${i}`} rowNum={rowNum} colNum={i} handleCellClick={handleCellClick} handleCellFlagClick={handleCellFlagClick} />)
+        }
     }
 
     return (
         <div className="game-row">
             {cells}
-            <Cell></Cell>
-            <Cell flat></Cell>
-            <CellMine></CellMine>
-            <CellFlag></CellFlag>
         </div>
     );
+
+    // <Cell></Cell>
+    //     <Cell flat></Cell>
+    //     <CellMine></CellMine>
+    //     <CellFlag></CellFlag>
 }
 
 class Board extends React.Component {
+    state = { boardData: null }
+
     constructor(props) {
         super(props);
+
+        this.updateBoardData();
+    }
+
+    updateBoardData = async () => {
+        let data = await getMinesweeperBoard();
+        this.setState({ boardData: data });
+
+        console.log(this.state);
+    }
+
+    handleCellClick = (row, col) => {
+        postBoardClick(row, col, this.updateBoardData);
+    }
+
+    handleCellFlagClick = (row, col) => {
+        postBoardFlagClick(row, col, this.updateBoardData);
+    }
+
+    handleBoardReset = () => {
+        let rows = this.props.rows;
+        let cols = this.props.cols;
+
+        postBoardReset(rows, cols, this.updateBoardData);
     }
 
     render() {
         let rows = this.props.rows;
         let cols = this.props.cols;
 
+        if (!this.state.boardData || !this.state.boardData.board) {
+            return null;
+        }
+
+        let boardData = this.state.boardData;
+        let board = boardData.board;
+
         let rowElements = []
 
-        for (let i = 0; i < rows; i++) {
-            rowElements.push(<Row key={`row-${i}`} cols={cols} />)
+        for (let i = 0; i < board.length; i++) {
+            rowElements.push(<Row key={`row-${i}`} rowNum={i} rowData={board[i]} handleCellClick={this.handleCellClick} handleCellFlagClick={this.handleCellFlagClick} />)
         }
 
         return (
-            <div className="game-board">
-                {rowElements}
+            <div>
+                <div className="game-board">
+                    {rowElements}
+                </div>
+
+                <button type="button" className="btn btn-secondary mt-4" onClick={this.handleBoardReset}>Reset Game</button>
+                <p>Finished: {String(boardData.finished)}</p>
+                <p>Game Won: {String(boardData.won)}</p>
             </div>
         );
     }
