@@ -104,8 +104,25 @@ class Cell:
 
         return "E"
 
-    def to_json(self):
-        pass
+    def to_json(self, reveal_mines=False):
+
+        # {"clicked": ..., "flag": ..., "mine": ..., "value": ...}
+        json_dic = {"clicked": self.clicked, "flag": self.has_flag}
+
+        if reveal_mines:
+            json_dic["mine"] = self.has_mine
+
+        # if clicked
+        if self.clicked:
+
+            # only send mine data if mine was clicked
+            if self.has_mine:
+                json_dic["mine"] = True
+
+            else:
+                json_dic["adjacentMines"] = self.get_mines_count_around()
+
+        return json_dic
 
 
 class Board:
@@ -236,7 +253,19 @@ class Board:
         return board_str
 
     def to_json(self):
-        pass
+        cells = [[0 for col in range(self.cols)] for row in range(self.rows)]
+
+        reveal_mines = False
+
+        if self.get_game_status() == GAME_LOST:
+            reveal_mines = True
+
+        for i in range(self.rows):
+            for j in range(self.cols):
+                cells[i][j] = self.cells[i][j].to_json(reveal_mines=reveal_mines)
+
+        return cells
+
 
 
 if __name__ == '__main__':
@@ -254,6 +283,8 @@ if __name__ == '__main__':
             board.flag_click(row, col)
         else:
             board.click(row, col)
+
+        print(board.to_json())
 
     # board.cells[0][3].has_mine = True
     # board.click(0, 0)
