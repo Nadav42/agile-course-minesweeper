@@ -1,4 +1,5 @@
 from WebServices.ExampleService import ExampleService
+from WebServices.BoardService import BoardService
 
 class Routing:
 
@@ -7,3 +8,4 @@ class Routing:
 
         # adding routes
         ExampleService(app, api, gameManager)
+        BoardService (app, api, gameManager)
