@@ -146,8 +146,24 @@ function GameFinishMessage(props) {
     }
 }
 
+function FlagModeButton(props) {
+    let activeClass = "";
+
+    if (props.flagMode) {
+        activeClass = "active";
+    }
+
+    return (
+        <div className="d-md-none">
+            <div className={`flag-mode-container ${activeClass}`} onClick={props.handleFlagModeClick}>
+                <div className="flag-mode-button"></div>
+            </div>
+        </div>
+    );
+}
+
 class Board extends React.Component {
-    state = { boardData: null }
+    state = { boardData: null, flagMode: false }
 
     constructor(props) {
         super(props);
@@ -155,9 +171,9 @@ class Board extends React.Component {
         this.socket = socketIOClient(url);
     }
 
-	componentDidMount() {
+    componentDidMount() {
         this.updateBoardData();
- 
+
         this.socket.on("boardChanged", this.updateBoardData);
     }
 
@@ -173,6 +189,13 @@ class Board extends React.Component {
     }
 
     handleCellClick = (row, col) => {
+        // if flag mode is active then normal click actually calls flag click (mobile support)
+        if (this.state.flagMode) {
+            this.handleCellFlagClick(row, col);
+            return;
+        }
+        
+        // normal click
         postBoardClick(row, col, this.updateBoardData);
     }
 
@@ -185,6 +208,10 @@ class Board extends React.Component {
         let cols = this.props.cols;
 
         postBoardReset(rows, cols, this.updateBoardData);
+    }
+
+    handleFlagModeClick = () => {
+        this.setState({ flagMode: !this.state.flagMode });
     }
 
     render() {
@@ -210,9 +237,11 @@ class Board extends React.Component {
                     {rowElements}
                 </div>
 
-                <div className="mb-4"></div>
-                <GameFinishMessage finished={boardData.finished} won={boardData.won}/>
+                <div className="mb-3"></div>
+                <GameFinishMessage finished={boardData.finished} won={boardData.won} />
                 <button type="button" className="btn btn-secondary" onClick={this.handleBoardReset}>Reset Game</button>
+
+                <FlagModeButton flagMode={this.state.flagMode} handleFlagModeClick={this.handleFlagModeClick} />
             </div>
         );
     }
