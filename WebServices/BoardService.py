@@ -12,7 +12,7 @@ class Fetch(Resource):
         return self.gameManager.get_board_with_status()
 
 
-class Click:
+class Click(Resource):
     def __init__(self, gameManager):
         self.gameManager = gameManager
 
@@ -29,11 +29,11 @@ class Click:
         col = int(body["col"])
         row = int(body["row"])
 
-        self.gameManager.click (row, col)
+        self.gameManager.click(row, col)
         return {"msg": "clicked"}
 
 
-class Flag:
+class Flag(Resource):
     def __init__(self, gameManager):
         self.gameManager = gameManager
 
@@ -50,11 +50,11 @@ class Flag:
         col = int(body["col"])
         row = int(body["row"])
 
-        self.gameManager.flag_click (row, col)
+        self.gameManager.flag_click(row, col)
         return {"msg": "flag clicked"}
 
 
-class Reset:
+class Reset(Resource):
     def __init__(self, gameManager):
         self.gameManager = gameManager
 
@@ -71,7 +71,7 @@ class Reset:
         cols = int(body["cols"])
         rows = int(body["rows"])
 
-        self.gameManager.reset (rows=rows, cols=cols)
+        self.gameManager.reset_game(rows=rows, cols=cols)
         return {"msg": "board reset"}
 
 

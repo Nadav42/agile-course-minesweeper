@@ -52,13 +52,34 @@ export const getMinesweeperBoard = async () => {
     return await get("/api/board/fetch");
 }
 
-// usage examples
-export const postStartMcts = (searchesPerMove, callback) => {
+// board normal click
+export const postBoardClick = (row, col, callback) => {
     let body = {
-        searchesPerMove: searchesPerMove
+        row: row,
+        col: col
     };
 
-    post("/api/mcts/start", body, "Starting MCTS", callback);
+    post("/api/board/click", body, callback);
+}
+
+// board flag click
+export const postBoardFlagClick = (row, col, callback) => {
+    let body = {
+        row: row,
+        col: col
+    };
+
+    post("/api/board/flag", body, callback);
+}
+
+// board reset
+export const postBoardReset = (rows, cols, callback) => {
+    let body = {
+        rows: rows,
+        cols: cols
+    };
+
+    post("/api/board/reset", body, callback);
 }
 
 // post example
