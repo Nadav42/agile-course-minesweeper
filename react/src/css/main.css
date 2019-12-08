@@ -31,7 +31,7 @@ body {
 }
 
 .game-cell.mine {
-  background-image: url("/mine.jpg");
+  background-image: url("/mine.png");
   background-size: cover;
   background-position: center;
 }
