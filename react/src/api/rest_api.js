@@ -73,10 +73,11 @@ export const postBoardFlagClick = (row, col, callback) => {
 }
 
 // board reset
-export const postBoardReset = (rows, cols, callback) => {
+export const postBoardReset = (rows, cols, mine_probability, callback) => {
     let body = {
         rows: rows,
-        cols: cols
+        cols: cols,
+        mine_probability: mine_probability
     };
 
     post("/api/board/reset", body, callback);

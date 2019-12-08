@@ -67,7 +67,7 @@ class Reset(Resource):
 
     def post(self):
         body = request.get_json()
-        must_have_args = ["rows", "cols"]
+        must_have_args = ["rows", "cols", "mine_probability"]
 
         # validate has all arguments
         for arg in must_have_args:
@@ -77,8 +77,8 @@ class Reset(Resource):
         # get arguments from post body
         cols = int(body["cols"])
         rows = int(body["rows"])
-
-        self.gameManager.reset_game(rows=rows, cols=cols)
+        mine_probability = float (body["mine_probability"])
+        self.gameManager.reset_game(rows=rows, cols=cols, mine_probability=mine_probability)
 
         self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "board reset"}

@@ -174,8 +174,18 @@ function FlagModeButton(props) {
     );
 }
 
+function Difficulty(props) {
+
+    let probToOneMine = (1 / (props.boardSize));
+    return (
+        <div className="my-3">
+            <input type="range" className="custom-range" id="customRange1" min={probToOneMine * 8} max={probToOneMine * 30} step={probToOneMine} value={props.value} onChange={props.mineProbabilityChanged} />
+        </div>
+    );
+}
+
 class Board extends React.Component {
-    state = { boardData: null, flagMode: false }
+    state = { boardData: null, flagMode: false, mine_probability: 11 / (this.props.rows * this.props.cols) }
 
     constructor(props) {
         super(props);
@@ -200,6 +210,7 @@ class Board extends React.Component {
         console.log(this.state);
     }
 
+
     handleCellClick = (row, col) => {
         // if flag mode is active then normal click actually calls flag click (mobile support)
         if (this.state.flagMode) {
@@ -218,18 +229,19 @@ class Board extends React.Component {
     handleBoardReset = () => {
         let rows = this.props.rows;
         let cols = this.props.cols;
+        let mine_probability = this.state.mine_probability;
 
-        postBoardReset(rows, cols, this.updateBoardData);
+        postBoardReset(rows, cols, mine_probability, this.updateBoardData);
+    }
+
+    mineProbabilityChanged = (e) => {
+        this.setState({ mine_probability: e.target.value });
     }
 
     handleFlagModeClick = () => {
         this.setState({ flagMode: !this.state.flagMode });
     }
-
     render() {
-        let rows = this.props.rows;
-        let cols = this.props.cols;
-
         if (!this.state.boardData || !this.state.boardData.board) {
             return null;
         }
@@ -247,6 +259,10 @@ class Board extends React.Component {
             <div>
                 <div className="game-board">
                     {rowElements}
+                </div>
+                <div className="slidecontainer" >
+                    <p>Difficulty:</p>
+                    <Difficulty boardSize={this.props.rows * this.props.cols} mineProbabilityChanged={this.mineProbabilityChanged} />
                 </div>
 
                 <div className="mb-3"></div>

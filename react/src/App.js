@@ -3,7 +3,6 @@ import React from "react";
 import Board from './components/minesweeper/Board'
 
 import './css/main.css'
-
 // App
 class App extends React.Component {
 	state = {};
