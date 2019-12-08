@@ -1,7 +1,14 @@
 import React from 'react';
 import socketIOClient from "socket.io-client";
 
-import { url, getMinesweeperBoard, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
+import { url, getMinesweeperBoard, getDifficultyRange, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
+
+// ---------------------- sounds ----------------------
+import UIfx from 'uifx'
+
+import winningSound1 from './winningSound.wav'
+const winningSound = new UIfx(winningSound1, {volume: 0.25});
+// --------------------------------------------------- //
 
 function CellMine(props) {
     return (
@@ -11,7 +18,6 @@ function CellMine(props) {
 }
 
 function CellFlag(props) {
-
     // in flag mode normal click calls flag click
     const flagModeClick = () => {
         props.handleCellClick(props.rowNum, props.colNum);
@@ -151,10 +157,10 @@ function GameFinishMessage(props) {
     }
 
     if (won) {
-        return <h3 className="text-success">You win!</h3>
+        return <h3 className="text-success mt-4">You win!</h3>
     }
     else {
-        return <h3 className="text-danger">You lost!</h3>
+        return <h3 className="text-danger mt-4">You lost!</h3>
     }
 }
 
@@ -175,26 +181,41 @@ function FlagModeButton(props) {
 }
 
 function Difficulty(props) {
+    let difficulty = props.difficulty; // 0.13 - sent from server.
+    let difficultyRangeData = props.difficultyRangeData; // {min: 0.07, max: 0.37} - sent from server.
 
-    let probToOneMine = (1 / (props.boardSize));
+    if (!difficulty || !difficultyRangeData) {
+        return null;
+    }
+
+    // slider range and steps settings
+    const minDifficulty = difficultyRangeData.min;
+    const maxDifficulty = difficultyRangeData.max;
+    const steps = 20; // how many steps the slider should fill
+
+    // don't touch
+    const stepSize = (maxDifficulty - minDifficulty) / steps;
+    
     return (
-        <div className="my-3">
-            <input type="range" className="custom-range" id="customRange1" min={probToOneMine * 8} max={probToOneMine * 30} step={probToOneMine} value={props.value} onChange={props.mineProbabilityChanged} />
+        <div className="my-3 text-center">
+            <input type="range" className="custom-range" value={props.difficulty} min={minDifficulty} max={maxDifficulty} step={stepSize} onChange={props.handleDifficultyChange} />
         </div>
     );
 }
 
 class Board extends React.Component {
-    state = { boardData: null, flagMode: false, mine_probability: 11 / (this.props.rows * this.props.cols) }
+    state = { boardData: null, difficultyRangeData: null, flagMode: false, difficulty: null }
 
     constructor(props) {
         super(props);
 
+        this.lastDifficulty = null;
         this.socket = socketIOClient(url);
     }
 
     componentDidMount() {
         this.updateBoardData();
+        this.updateDifficultyRange();
 
         this.socket.on("boardChanged", this.updateBoardData);
     }
@@ -203,13 +224,32 @@ class Board extends React.Component {
         this.socket.off("boardChanged", this.updateBoardData);
     }
 
-    updateBoardData = async () => {
+    updateBoardData = async (playWinSound) => {
         let data = await getMinesweeperBoard();
         this.setState({ boardData: data });
 
-        console.log(this.state);
+        // init difficulty from server, only update when server value changed.
+        if (this.lastDifficulty !== data.difficulty) {
+            this.lastDifficulty = data.difficulty;
+
+            // only update view if value changed on server
+            this.setState({ difficulty: data.difficulty });
+        }
+
+        // play sound only after the winning click
+        if (playWinSound === true) {
+            if (data.won) {
+                winningSound.play();
+            }
+        }
     }
 
+    updateDifficultyRange = async () => {
+        let data = await getDifficultyRange();
+        this.setState({ difficultyRangeData: data });
+
+        console.log(this.state);
+    }
 
     handleCellClick = (row, col) => {
         // if flag mode is active then normal click actually calls flag click (mobile support)
@@ -218,8 +258,12 @@ class Board extends React.Component {
             return;
         }
 
+        const updateBoardAndCheckWinSound = () => {
+            this.updateBoardData(true);
+        }
+
         // normal click
-        postBoardClick(row, col, this.updateBoardData);
+        postBoardClick(row, col, updateBoardAndCheckWinSound);
     }
 
     handleCellFlagClick = (row, col) => {
@@ -229,18 +273,19 @@ class Board extends React.Component {
     handleBoardReset = () => {
         let rows = this.props.rows;
         let cols = this.props.cols;
-        let mine_probability = this.state.mine_probability;
+        let difficulty = this.state.difficulty;
 
-        postBoardReset(rows, cols, mine_probability, this.updateBoardData);
+        postBoardReset(rows, cols, difficulty, this.updateBoardData);
     }
 
-    mineProbabilityChanged = (e) => {
-        this.setState({ mine_probability: e.target.value });
+    handleDifficultyChange = (e) => {
+        this.setState({ difficulty: e.target.value });
     }
 
     handleFlagModeClick = () => {
         this.setState({ flagMode: !this.state.flagMode });
     }
+    
     render() {
         if (!this.state.boardData || !this.state.boardData.board) {
             return null;
@@ -256,19 +301,20 @@ class Board extends React.Component {
         }
 
         return (
-            <div>
+            <div className="mb-5">
                 <div className="game-board">
                     {rowElements}
                 </div>
+
                 <div className="slidecontainer" >
                     <p>Difficulty:</p>
-                    <Difficulty boardSize={this.props.rows * this.props.cols} mineProbabilityChanged={this.mineProbabilityChanged} />
+                    <Difficulty difficulty={this.state.difficulty} difficultyRangeData={this.state.difficultyRangeData} handleDifficultyChange={this.handleDifficultyChange} />
                 </div>
 
                 <div className="mb-3"></div>
-                <GameFinishMessage finished={boardData.finished} won={boardData.won} />
                 <button type="button" className="btn btn-secondary" onClick={this.handleBoardReset}>Reset Game</button>
 
+                <GameFinishMessage finished={boardData.finished} won={boardData.won} />
                 <FlagModeButton flagMode={this.state.flagMode} handleFlagModeClick={this.handleFlagModeClick} />
             </div>
         );

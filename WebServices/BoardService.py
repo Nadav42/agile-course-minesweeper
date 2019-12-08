@@ -12,6 +12,15 @@ class Fetch(Resource):
         return self.gameManager.get_board_with_status()
 
 
+class DifficultyRange(Resource):
+
+    def __init__(self, gameManager):
+        self.gameManager = gameManager
+
+    def get(self):
+        return self.gameManager.get_difficulty_options()
+
+
 class Click(Resource):
     def __init__(self, gameManager, socket_io):
         self.gameManager = gameManager
@@ -67,7 +76,7 @@ class Reset(Resource):
 
     def post(self):
         body = request.get_json()
-        must_have_args = ["rows", "cols", "mine_probability"]
+        must_have_args = ["rows", "cols", "difficulty"]
 
         # validate has all arguments
         for arg in must_have_args:
@@ -77,8 +86,10 @@ class Reset(Resource):
         # get arguments from post body
         cols = int(body["cols"])
         rows = int(body["rows"])
-        mine_probability = float (body["mine_probability"])
-        self.gameManager.reset_game(rows=rows, cols=cols, mine_probability=mine_probability)
+        difficulty = float(body["difficulty"])
+
+        # reset the game
+        self.gameManager.reset_game(rows=rows, cols=cols, mine_probability=difficulty)
 
         self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "board reset"}
@@ -89,6 +100,7 @@ class BoardService:
 
         # add rest endpoints
         api.add_resource(Fetch, '/api/board/fetch', resource_class_kwargs={'gameManager': gameManager})
+        api.add_resource(DifficultyRange, '/api/board/difficultyrange', resource_class_kwargs={'gameManager': gameManager})
         api.add_resource(Click, '/api/board/click', resource_class_kwargs={'gameManager': gameManager, 'socket_io': socket_io})
         api.add_resource(Flag, '/api/board/flag', resource_class_kwargs={'gameManager': gameManager, 'socket_io': socket_io})
         api.add_resource(Reset, '/api/board/reset', resource_class_kwargs={'gameManager': gameManager, 'socket_io': socket_io})

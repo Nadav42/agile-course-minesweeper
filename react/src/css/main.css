@@ -2,26 +2,6 @@ body {
   background-color: white;
 }
 
-.custom-range:hover {
-  opacity: 0.9;
-}
-.custom-range {
-  -webkit-appearance: none;
-  width: 32%;
-  height: 35px;
-  background: #d3d3d3;
-  outline: none;
-  opacity: 0.6;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-}
-
-.custom-range::-moz-range-thumb {
-  width: 15px;
-  height: 15px;
-  background: #4CAF50;
-  cursor: pointer;
-}
 .game-board {
   margin-top: 16px;
   padding: 8px;
@@ -150,4 +130,29 @@ body {
 
   left: 5px;
   top: 5px;
+}
+
+.custom-range:hover {
+  opacity: 0.9;
+}
+
+.custom-range {
+  -webkit-appearance: none;
+
+  height: 35px;
+  width: 100%;
+  max-width: 400px;
+  
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.6;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.custom-range::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background: #4CAF50;
+  cursor: pointer;
 }
