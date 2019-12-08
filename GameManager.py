@@ -1,4 +1,4 @@
-from Minesweeper.Board import Board, GAME_NOT_FINISHED, GAME_WON, GAME_LOST
+from Minesweeper.Board import Board, GAME_NOT_FINISHED, GAME_WON, GAME_LOST, MIN_DIFFICULTY, MAX_DIFFICULTY
 
 class GameManager:
 
@@ -14,7 +14,7 @@ class GameManager:
         if self.board.get_game_status() == GAME_LOST:
             finished =True
 
-        return {"board": self.board.to_json(), "won": won, "finished": finished}
+        return {"board": self.board.to_json(), "won": won, "finished": finished, "difficulty": self.board.get_difficulty()}
 
     def click(self, row, col):
         self.board.click(row, col)
@@ -25,5 +25,5 @@ class GameManager:
     def reset_game(self, rows=9, cols=9, mine_probability=0.13):
         self.board.reset(rows, cols, mine_probability)
 
-    # return to user something like
-    # {board: gameManager.get_board(), gameStatus: gameManager.game_status()}
+    def get_difficulty_options(self):
+        return {"min": MIN_DIFFICULTY, "max": MAX_DIFFICULTY}

@@ -52,6 +52,11 @@ export const getMinesweeperBoard = async () => {
     return await get("/api/board/fetch");
 }
 
+// get difficulty options (min-max range)
+export const getDifficultyRange = async () => {
+    return await get("/api/board/difficultyrange");
+}
+
 // board normal click
 export const postBoardClick = (row, col, callback) => {
     let body = {
@@ -73,11 +78,11 @@ export const postBoardFlagClick = (row, col, callback) => {
 }
 
 // board reset
-export const postBoardReset = (rows, cols, mine_probability, callback) => {
+export const postBoardReset = (rows, cols, difficulty, callback) => {
     let body = {
         rows: rows,
         cols: cols,
-        mine_probability: mine_probability
+        difficulty: difficulty
     };
 
     post("/api/board/reset", body, callback);

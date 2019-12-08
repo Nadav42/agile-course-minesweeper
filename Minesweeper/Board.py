@@ -5,6 +5,10 @@ GAME_NOT_FINISHED = 0
 GAME_WON = 1 # cleared all mines
 GAME_LOST = 2 # clicked a mine
 
+# difficulty
+MIN_DIFFICULTY = 0.07
+MAX_DIFFICULTY = 0.37
+
 class Cell:
 
     def __init__(self):
@@ -127,16 +131,15 @@ class Cell:
 
 class Board:
 
-    def __init__(self, rows=9, cols=9,mine_probability=0.13):
-        # self.mine_probability = 0.13 # this is the difficulty
+    def __init__(self, rows=9, cols=9, mine_probability=0.13):
 
         # load the board
         self.reset(rows=rows, cols=cols, mine_probability=mine_probability)
 
-    def reset(self, rows=9, cols=9,mine_probability=0.13):
+    def reset(self, rows=9, cols=9, mine_probability=0.13):
         self.rows = rows
         self.cols = cols
-        self.mine_probability=mine_probability
+        self.mine_probability = mine_probability
         self.game_over = GAME_NOT_FINISHED
 
         # cell objects
@@ -157,7 +160,7 @@ class Board:
 
         # init mines
         self.place_mines()
-        print(mine_probability)
+
     def get_cell(self, row, col):
 
         if row < 0 or row >= self.rows:
@@ -244,6 +247,9 @@ class Board:
 
     def get_game_status(self):
         return self.game_over
+
+    def get_difficulty(self):
+        return self.mine_probability
 
     def __str__(self):
         board_str = ""
