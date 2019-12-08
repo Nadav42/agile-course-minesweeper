@@ -2,6 +2,10 @@ import React from 'react';
 import socketIOClient from "socket.io-client";
 
 import { url, getMinesweeperBoard, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
+import UIfx from 'uifx'
+import winningSound1 from '../winningSound.wav'
+
+const winningSound = new UIfx(winningSound1);
 
 function CellMine(props) {
     return (
@@ -11,7 +15,6 @@ function CellMine(props) {
 }
 
 function CellFlag(props) {
-
     // in flag mode normal click calls flag click
     const flagModeClick = () => {
         props.handleCellClick(props.rowNum, props.colNum);
@@ -151,6 +154,7 @@ function GameFinishMessage(props) {
     }
 
     if (won) {
+        winningSound.play();
         return <h3 className="text-success">You win!</h3>
     }
     else {
@@ -186,7 +190,7 @@ function Difficulty(props) {
 
 class Board extends React.Component {
     state = { boardData: null, flagMode: false, mine_probability: 11 / (this.props.rows * this.props.cols) }
-
+    
     constructor(props) {
         super(props);
 
@@ -268,11 +272,11 @@ class Board extends React.Component {
                 <div className="mb-3"></div>
                 <GameFinishMessage finished={boardData.finished} won={boardData.won} />
                 <button type="button" className="btn btn-secondary" onClick={this.handleBoardReset}>Reset Game</button>
-
                 <FlagModeButton flagMode={this.state.flagMode} handleFlagModeClick={this.handleFlagModeClick} />
             </div>
         );
     }
 }
-
+            //  { <button type="button" className="btn btn-secondary" onClick={beep.play}>BEEPPPP</button> }
+   
 export default Board;
