@@ -15,8 +15,8 @@ from WebServices.Routing import Routing
 
 app = Flask(__name__)
 
-socketio = SocketIO(async_mode="eventlet")
-socketio.init_app(app, cors_allowed_origins=["http://localhost:3000"], async_mode="eventlet")
+socketio = SocketIO()
+socketio.init_app(app, cors_allowed_origins=["http://localhost:3000"])
 
 api = Api(app)
 

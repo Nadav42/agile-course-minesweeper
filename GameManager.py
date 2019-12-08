@@ -16,19 +16,14 @@ class GameManager:
 
         return {"board": self.board.to_json(), "won": won, "finished": finished}
 
-        # return self.board.to_json()
-
-    # def game_status(self):
-    #     return self.board.get_game_status() # GAME_NOT_FINISHED, GAME_WON, GAME_LOST
-
     def click(self, row, col):
         self.board.click(row, col)
 
     def flag_click(self, row, col):
         self.board.flag_click(row, col)
 
-    def reset_game(self, rows=9, cols=9):
-        self.board.reset(rows, cols)
+    def reset_game(self, rows=9, cols=9, mine_probability=0.13):
+        self.board.reset(rows, cols, mine_probability)
 
     # return to user something like
     # {board: gameManager.get_board(), gameStatus: gameManager.game_status()}
