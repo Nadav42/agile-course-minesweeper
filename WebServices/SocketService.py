@@ -4,5 +4,5 @@ class SocketService:
 
         @socketio.on('boardAction')
         def handle_message():
-            print('received message:')
+            socketio.emit('boardChanged', {}, broadcast=True, include_self=False)
 

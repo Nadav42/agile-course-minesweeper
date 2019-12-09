@@ -2,17 +2,23 @@ body {
   background-color: white;
 }
 
-.game-board {
-  margin-top: 16px;
-  padding: 8px;
-
+.game-contianer {
   overflow: auto;
   white-space: nowrap; 
+
+  padding: 8px 0px 8px 0px;
+}
+
+.game-board {
+  display: inline-block;
+
+  border: solid 3px #aaaaaa;
+  border-top: solid 3px #888888;
+  border-left: solid 3px #888888;
 }
 
 .game-row {
   height: 32px;
-  margin-bottom: 10px;
 }
 
 .game-cell {
@@ -22,12 +28,8 @@ body {
 
   display: inline-block;
   border: solid 1px #888888;
-  margin-right: 10px;
-
+ 
   position: relative;
-
-  outline-style: solid;
-  outline-color: #888888;
 }
 
 .game-cell.mine {
@@ -132,16 +134,18 @@ body {
   top: 5px;
 }
 
+.reset-form {
+  width: 100%;
+  max-width: 350px;
+}
+
 .custom-range:hover {
   opacity: 0.9;
 }
 
 .custom-range {
   -webkit-appearance: none;
-
   height: 35px;
-  width: 100%;
-  max-width: 400px;
   
   background: #d3d3d3;
   outline: none;

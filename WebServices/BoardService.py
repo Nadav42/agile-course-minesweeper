@@ -3,6 +3,9 @@ from flask_restful import Resource, reqparse
 import traceback
 
 
+MIN_BOARD_SIZE = 7
+MAX_BOARD_SIZE = 24
+
 class Fetch(Resource):
 
     def __init__(self, gameManager):
@@ -41,7 +44,6 @@ class Click(Resource):
 
         self.gameManager.click(row, col)
 
-        self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "clicked"}
 
 
@@ -65,7 +67,6 @@ class Flag(Resource):
 
         self.gameManager.flag_click(row, col)
 
-        self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "flag clicked"}
 
 
@@ -88,10 +89,15 @@ class Reset(Resource):
         rows = int(body["rows"])
         difficulty = float(body["difficulty"])
 
+        if rows < MIN_BOARD_SIZE or cols < MIN_BOARD_SIZE:
+            return {"errorMsg": "Board size must be larger than {}".format(MIN_BOARD_SIZE)}
+
+        if rows > MAX_BOARD_SIZE or cols > MAX_BOARD_SIZE:
+            return {"errorMsg": "Board size must be smaller than {}".format(MAX_BOARD_SIZE)}
+
         # reset the game
         self.gameManager.reset_game(rows=rows, cols=cols, mine_probability=difficulty)
 
-        self.socket_io.emit('boardChanged', {}, broadcast=True)
         return {"msg": "board reset"}
 
 

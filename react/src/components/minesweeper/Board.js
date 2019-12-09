@@ -7,7 +7,7 @@ import { url, getMinesweeperBoard, getDifficultyRange, postBoardClick, postBoard
 import UIfx from 'uifx'
 
 import winningSound1 from './winningSound.wav'
-const winningSound = new UIfx(winningSound1, {volume: 0.25});
+const winningSound = new UIfx(winningSound1, { volume: 0.25 });
 // --------------------------------------------------- //
 
 function CellMine(props) {
@@ -30,10 +30,10 @@ function CellFlag(props) {
     }
 
     if (props.flagMode) {
-        return <div className="game-cell flag" onClick={flagModeClick}></div>;
+        return <div className="game-cell filled flag" onClick={flagModeClick}></div>;
     }
     else {
-        return <div className="game-cell flag" onContextMenu={flagRightClick}></div>;
+        return <div className="game-cell filled flag" onContextMenu={flagRightClick}></div>;
     }
 
 
@@ -195,7 +195,7 @@ function Difficulty(props) {
 
     // don't touch
     const stepSize = (maxDifficulty - minDifficulty) / steps;
-    
+
     return (
         <div className="my-3 text-center">
             <input type="range" className="custom-range" value={props.difficulty} min={minDifficulty} max={maxDifficulty} step={stepSize} onChange={props.handleDifficultyChange} />
@@ -204,12 +204,15 @@ function Difficulty(props) {
 }
 
 class Board extends React.Component {
-    state = { boardData: null, difficultyRangeData: null, flagMode: false, difficulty: null }
+    state = { boardData: null, difficultyRangeData: null, flagMode: false, difficulty: null, rows: 9, cols: 9 }
 
     constructor(props) {
         super(props);
 
         this.lastDifficulty = null;
+        this.lastRows = null;
+        this.lastCols = null;
+
         this.socket = socketIOClient(url);
     }
 
@@ -229,11 +232,24 @@ class Board extends React.Component {
         this.setState({ boardData: data });
 
         // init difficulty from server, only update when server value changed.
-        if (this.lastDifficulty !== data.difficulty) {
+        if (data && data.difficulty && this.lastDifficulty !== data.difficulty) {
             this.lastDifficulty = data.difficulty;
 
             // only update view if value changed on server
             this.setState({ difficulty: data.difficulty });
+        }
+
+        // init from server, only update when server value changed.
+        if (data && data.board) {
+            let rows = data.board.length;
+            let cols = data.board[0].length;
+
+            if (this.lastRows !== rows || this.lastCols !== cols) {
+                this.lastRows = rows;
+                this.lastCols = cols;
+
+                this.setState({ rows: rows, cols: cols })
+            }
         }
 
         // play sound only after the winning click
@@ -260,6 +276,7 @@ class Board extends React.Component {
 
         const updateBoardAndCheckWinSound = () => {
             this.updateBoardData(true);
+            this.socket.emit("boardAction");
         }
 
         // normal click
@@ -267,25 +284,41 @@ class Board extends React.Component {
     }
 
     handleCellFlagClick = (row, col) => {
-        postBoardFlagClick(row, col, this.updateBoardData);
+        // send action to server, then request new board state and notify other users
+        const updateBoardDataAndNotifyAction = () => {
+            this.updateBoardData();
+            this.socket.emit("boardAction");
+        }
+
+        postBoardFlagClick(row, col, updateBoardDataAndNotifyAction);
     }
 
     handleBoardReset = () => {
-        let rows = this.props.rows;
-        let cols = this.props.cols;
+        let rows = this.state.rows;
+        let cols = this.state.cols;
         let difficulty = this.state.difficulty;
 
-        postBoardReset(rows, cols, difficulty, this.updateBoardData);
+        // send action to server, then request new board state and notify other users
+        const updateBoardDataAndNotifyAction = () => {
+            this.updateBoardData();
+            this.socket.emit("boardAction");
+        }
+
+        postBoardReset(rows, cols, difficulty, updateBoardDataAndNotifyAction);
     }
 
     handleDifficultyChange = (e) => {
         this.setState({ difficulty: e.target.value });
     }
 
+    handleRowsColsInputChange = (e) => {
+        this.setState({ rows: e.target.value, cols: e.target.value });
+    }
+
     handleFlagModeClick = () => {
         this.setState({ flagMode: !this.state.flagMode });
     }
-    
+
     render() {
         if (!this.state.boardData || !this.state.boardData.board) {
             return null;
@@ -302,21 +335,41 @@ class Board extends React.Component {
 
         return (
             <div className="mb-5">
-                <div className="game-board">
-                    {rowElements}
+
+                <div className="game-contianer">
+                    <div className="game-board">
+                        {rowElements}
+                    </div>
                 </div>
 
-                <div className="slidecontainer" >
-                    <p>Difficulty:</p>
-                    <Difficulty difficulty={this.state.difficulty} difficultyRangeData={this.state.difficultyRangeData} handleDifficultyChange={this.handleDifficultyChange} />
+                <hr></hr>
+
+                <div className="form-group text-left mx-auto reset-form">
+                    <div className="row text-center mt-3 mb-3">
+                        <div className="col-6">
+                            <label>Rows</label>
+                            <input type="text" className="form-control" value={this.state.rows} onChange={this.handleRowsColsInputChange} />
+                        </div>
+                        <div className="col-6">
+                            <label>Cols</label>
+                            <input type="text" className="form-control" value={this.state.cols} onChange={this.handleRowsColsInputChange} />
+                        </div>
+                    </div>
+
+                    <div className="slidecontainer" >
+                        <p>Difficulty:</p>
+                        <Difficulty difficulty={this.state.difficulty} difficultyRangeData={this.state.difficultyRangeData} handleDifficultyChange={this.handleDifficultyChange} />
+                    </div>
                 </div>
+
+
 
                 <div className="mb-3"></div>
                 <button type="button" className="btn btn-secondary" onClick={this.handleBoardReset}>Reset Game</button>
 
                 <GameFinishMessage finished={boardData.finished} won={boardData.won} />
                 <FlagModeButton flagMode={this.state.flagMode} handleFlagModeClick={this.handleFlagModeClick} />
-            </div>
+            </div >
         );
     }
 }

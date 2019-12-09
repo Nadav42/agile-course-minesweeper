@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 let browserCurrentUrl = window.location.href;
 let host = browserCurrentUrl.split("/")[2];
@@ -37,6 +37,10 @@ const get = async (endpointUrl, params) => {
 const post = async (endpointUrl, bodyData, callback) => {
     api.post(`${url}${endpointUrl}`, bodyData, { withCredentials: true })
         .then((response) => {
+            if (response.data["errorMsg"]) {
+                toast.error(response.data["errorMsg"])
+            }
+
             if (callback) {
                 callback();
             }
