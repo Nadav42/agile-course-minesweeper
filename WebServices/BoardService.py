@@ -43,6 +43,7 @@ class Click(Resource):
         row = int(body["row"])
 
         self.gameManager.click(row, col)
+        self.socket_io.emit('boardChanged', {}, broadcast=True)
 
         return {"msg": "clicked"}
 
@@ -66,6 +67,7 @@ class Flag(Resource):
         row = int(body["row"])
 
         self.gameManager.flag_click(row, col)
+        self.socket_io.emit('boardChanged', {}, broadcast=True)
 
         return {"msg": "flag clicked"}
 
@@ -97,6 +99,7 @@ class Reset(Resource):
 
         # reset the game
         self.gameManager.reset_game(rows=rows, cols=cols, mine_probability=difficulty)
+        self.socket_io.emit('boardChanged', {}, broadcast=True)
 
         return {"msg": "board reset"}
 

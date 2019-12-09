@@ -276,7 +276,6 @@ class Board extends React.Component {
 
         const updateBoardAndCheckWinSound = () => {
             this.updateBoardData(true);
-            this.socket.emit("boardAction");
         }
 
         // normal click
@@ -284,13 +283,7 @@ class Board extends React.Component {
     }
 
     handleCellFlagClick = (row, col) => {
-        // send action to server, then request new board state and notify other users
-        const updateBoardDataAndNotifyAction = () => {
-            this.updateBoardData();
-            this.socket.emit("boardAction");
-        }
-
-        postBoardFlagClick(row, col, updateBoardDataAndNotifyAction);
+        postBoardFlagClick(row, col, this.updateBoardData);
     }
 
     handleBoardReset = () => {
@@ -298,13 +291,7 @@ class Board extends React.Component {
         let cols = this.state.cols;
         let difficulty = this.state.difficulty;
 
-        // send action to server, then request new board state and notify other users
-        const updateBoardDataAndNotifyAction = () => {
-            this.updateBoardData();
-            this.socket.emit("boardAction");
-        }
-
-        postBoardReset(rows, cols, difficulty, updateBoardDataAndNotifyAction);
+        postBoardReset(rows, cols, difficulty, this.updateBoardData);
     }
 
     handleDifficultyChange = (e) => {
