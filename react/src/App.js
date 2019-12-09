@@ -1,8 +1,15 @@
 import React from "react";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Board from './components/minesweeper/Board'
 
 import './css/main.css'
+
+// Call it once in your app. At the root of your app is the best place
+toast.configure()
+
 // App
 class App extends React.Component {
 	state = {};
@@ -19,8 +26,10 @@ class App extends React.Component {
 					<h1>Minesweeper</h1>
 				</div>
 				<div className="container text-center mx-auto">
-					<Board rows={9} cols={9} />
+					<Board />
 				</div>
+
+				<ToastContainer />
 			</div>
 		);
 	}
