@@ -1,7 +1,7 @@
 import React from 'react';
 import socketIOClient from "socket.io-client";
 
-import { url, getMinesweeperBoard, getDifficultyRange, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
+import { url, socket_host, getMinesweeperBoard, getDifficultyRange, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
 
 // ---------------------- sounds ----------------------
 import UIfx from 'uifx'
@@ -25,8 +25,9 @@ function CellFlag(props) {
 
     // right click (or hold in android)
     const flagRightClick = (e) => {
+        e.preventDefault(); // must do preventDefault() first or it will block socket / network requests
+
         props.handleCellFlagClick(props.rowNum, props.colNum);
-        e.preventDefault();
     }
 
     if (props.flagMode) {
@@ -61,8 +62,9 @@ function ClickableCell(props) {
     }
 
     const flagClick = (e) => {
+        e.preventDefault(); // must do preventDefault() first or it will block socket / network requests
+
         props.handleCellFlagClick(props.rowNum, props.colNum);
-        e.preventDefault();
     }
 
     return (
@@ -212,8 +214,8 @@ class Board extends React.Component {
         this.lastDifficulty = null;
         this.lastRows = null;
         this.lastCols = null;
-
-        this.socket = socketIOClient(url);
+    
+        this.socket = socketIOClient(socket_host);
     }
 
     componentDidMount() {
@@ -260,6 +262,11 @@ class Board extends React.Component {
         }
     }
 
+    updateBoardDataAndNotifySocketUpdate = (playWinSound) => {
+        this.updateBoardData(playWinSound);
+        this.socket.emit("boardAction");
+    }
+
     updateDifficultyRange = async () => {
         let data = await getDifficultyRange();
         this.setState({ difficultyRangeData: data });
@@ -275,7 +282,7 @@ class Board extends React.Component {
         }
 
         const updateBoardAndCheckWinSound = () => {
-            this.updateBoardData(true);
+            this.updateBoardDataAndNotifySocketUpdate(true)
         }
 
         // normal click
@@ -283,7 +290,7 @@ class Board extends React.Component {
     }
 
     handleCellFlagClick = (row, col) => {
-        postBoardFlagClick(row, col, this.updateBoardData);
+        postBoardFlagClick(row, col, this.updateBoardDataAndNotifySocketUpdate);
     }
 
     handleBoardReset = () => {
@@ -291,7 +298,7 @@ class Board extends React.Component {
         let cols = this.state.cols;
         let difficulty = this.state.difficulty;
 
-        postBoardReset(rows, cols, difficulty, this.updateBoardData);
+        postBoardReset(rows, cols, difficulty, this.updateBoardDataAndNotifySocketUpdate);
     }
 
     handleDifficultyChange = (e) => {

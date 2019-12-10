@@ -1,6 +1,5 @@
 Flask
 Flask-RESTful
-Flask-CORS
 
 flask-socketio
 eventlet

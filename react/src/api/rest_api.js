@@ -9,6 +9,7 @@ let apiUrl = `http://${host}:5000`
 console.log(host, apiUrl)
 
 export let url = apiUrl;
+export let socket_host = `${host}:5000`;
 
 // axios
 let api = axios.create({

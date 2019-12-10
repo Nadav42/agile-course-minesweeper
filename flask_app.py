@@ -5,7 +5,6 @@ eventlet.monkey_patch()
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_restful import Resource, Api, reqparse
-# from flask_cors import CORS, cross_origin
 
 from flask_socketio import SocketIO
 
@@ -16,7 +15,7 @@ from WebServices.Routing import Routing
 app = Flask(__name__)
 
 socketio = SocketIO()
-socketio.init_app(app, cors_allowed_origins=["http://localhost:3000"])
+socketio.init_app(app, cors_allowed_origins="*")
 
 api = Api(app)
 
@@ -33,6 +32,7 @@ gameManager = GameManager()
 
 # add flask routes and endpoints in Routing
 Routing(app, api, socketio, gameManager)
+
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -70,6 +70,6 @@ def after_request(response):
 if __name__ == '__main__':
 
     if SHOULD_BIND_ADRESS:
-        socketio.run(app, host="0.0.0.0", port='5000')
+        socketio.run(app, host="0.0.0.0", port=5000)
     else:
-        socketio.run(app, port='5000', debug=True)
+        socketio.run(app, port=5000, debug=True)
