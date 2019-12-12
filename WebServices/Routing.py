@@ -7,7 +7,9 @@ class Routing:
     # add all routes and endpoints here, don't touch flask_app.py
     def __init__(self, app, api, socketio, gameManager):
 
-        # adding routes
+        # rest api routes
         ExampleService(app, api, socketio, gameManager)
         BoardService(app, api, socketio, gameManager)
-        SocketService(app, api, socketio, gameManager)
+
+        # socket routes
+        SocketService(socketio, gameManager)

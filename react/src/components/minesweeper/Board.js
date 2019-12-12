@@ -223,6 +223,8 @@ class Board extends React.Component {
         this.updateDifficultyRange();
 
         this.socket.on("boardChanged", this.updateBoardData);
+        this.socket.emit("joinLobby", "demo")
+        this.socket.emit("joinLobby", "demo2")
     }
 
     componentWillUnmount() {
