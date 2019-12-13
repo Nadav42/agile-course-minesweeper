@@ -3,6 +3,7 @@ from flask_restful import Resource
 import traceback
 
 from WebServices.SessionKeys import LOBBY_SESSION_KEY
+from WebServices.Headers import NO_CACHE_HEADERS
 
 class LobbyList(Resource):
 
@@ -13,7 +14,7 @@ class LobbyList(Resource):
         lobbies_list = self.gameManager.get_lobbies_list()
         reversed_list = lobbies_list[::-1] # show newest lobby on top
 
-        return reversed_list
+        return reversed_list, 200, NO_CACHE_HEADERS
 
 class JoinLobby(Resource):
 
