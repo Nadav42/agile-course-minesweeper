@@ -1,7 +1,9 @@
 import React from 'react';
+import { Link } from "react-router-dom";
+
 import socketIOClient from "socket.io-client";
 
-import { url, socket_host, getMinesweeperBoard, getDifficultyRange, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
+import { socket_host, getMinesweeperBoard, getDifficultyRange, postBoardClick, postBoardFlagClick, postBoardReset } from '../../api/rest_api'
 
 // ---------------------- sounds ----------------------
 import UIfx from 'uifx'
@@ -214,7 +216,7 @@ class Board extends React.Component {
         this.lastDifficulty = null;
         this.lastRows = null;
         this.lastCols = null;
-    
+
         this.socket = socketIOClient(socket_host);
     }
 
@@ -223,8 +225,7 @@ class Board extends React.Component {
         this.updateDifficultyRange();
 
         this.socket.on("boardChanged", this.updateBoardData);
-        this.socket.emit("joinLobby", "demo")
-        this.socket.emit("joinLobby", "demo2")
+        this.socket.emit("joinLobby"); // will join socket room as set in user server session
     }
 
     componentWillUnmount() {
@@ -234,6 +235,11 @@ class Board extends React.Component {
     updateBoardData = async (playWinSound) => {
         let data = await getMinesweeperBoard();
         this.setState({ boardData: data });
+
+        // no lobby session set
+        if (data && data.errorMsg && data.lobbyError) {
+            window.location.href = "/"
+        }
 
         // init difficulty from server, only update when server value changed.
         if (data && data.difficulty && this.lastDifficulty !== data.difficulty) {
@@ -317,7 +323,13 @@ class Board extends React.Component {
 
     render() {
         if (!this.state.boardData || !this.state.boardData.board) {
-            return null;
+            return (
+                <div className="mt-4">
+                    <Link to="/">
+                        <button type="button" className="btn btn-success">Lobby List</button>
+                    </Link>
+                </div>
+            );
         }
 
         let boardData = this.state.boardData;
@@ -361,7 +373,13 @@ class Board extends React.Component {
 
 
                 <div className="mb-3"></div>
-                <button type="button" className="btn btn-secondary" onClick={this.handleBoardReset}>Reset Game</button>
+
+
+                <Link to="/">
+                    <button type="button" className="btn btn-success mr-2">Lobby List</button>
+                </Link>
+
+                <button type="button" className="btn btn-info" onClick={this.handleBoardReset}>Reset Game</button>
 
                 <GameFinishMessage finished={boardData.finished} won={boardData.won} />
                 <FlagModeButton flagMode={this.state.flagMode} handleFlagModeClick={this.handleFlagModeClick} />

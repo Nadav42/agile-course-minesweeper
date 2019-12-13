@@ -41,9 +41,10 @@ const post = async (endpointUrl, bodyData, callback) => {
             if (response.data["errorMsg"]) {
                 toast.error(response.data["errorMsg"])
             }
-
-            if (callback) {
-                callback();
+            else {
+                if (callback) {
+                    callback();
+                }
             }
         }, (error) => {
             console.log(error);
@@ -93,9 +94,38 @@ export const postBoardReset = (rows, cols, difficulty, callback) => {
     post("/api/board/reset", body, callback);
 }
 
-// post example
-export const getBenchmarkEnginesList = async () => {
-    return await get("/api/benchmark/engines");
+// get lobbies list
+export const getLobbiesList = async () => {
+    return await get("/api/lobby/list");
+}
+
+// join lobby post request
+export const postJoinLobby = (lobbyKey, callback) => {
+    let body = {
+        lobbyKey: lobbyKey
+    };
+
+    post("/api/lobby/join", body, callback);
+}
+
+// join lobby post request
+export const postJoinLobbyWithPassword = (lobbyKey, password, callback) => {
+    let body = {
+        lobbyKey: lobbyKey,
+        password: password
+    };
+
+    post("/api/lobby/join", body, callback);
+}
+
+// create lobby
+export const postCreateLobby = (lobbyName, password, callback) => {
+    let body = {
+        lobbyName: lobbyName,
+        password: password
+    };
+
+    post("/api/lobby/create", body, callback);
 }
 
 export default api;

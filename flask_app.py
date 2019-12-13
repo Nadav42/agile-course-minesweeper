@@ -1,10 +1,11 @@
 import os
 
-import eventlet
-eventlet.monkey_patch()
+# import eventlet
+# eventlet.monkey_patch()
 
-from flask import Flask, render_template, request, jsonify, send_from_directory
-from flask_restful import Resource, Api, reqparse
+from flask import Flask, request, send_from_directory
+from flask_restful import Api
+from flask_session import Session
 
 from flask_socketio import SocketIO
 
@@ -14,13 +15,20 @@ from WebServices.Routing import Routing
 
 app = Flask(__name__)
 
+# ----- config ----- #
+
+app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SECRET_KEY'] = 'Az5Jf$y1cSt'
+
+# ------------------ #
+
+Session(app)
+
 socketio = SocketIO()
 socketio.init_app(app, cors_allowed_origins="*")
 
 api = Api(app)
-
-app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
-app.config['SECRET_KEY'] = 'Az5Jf$y1cSt'
 
 # change static folder to react build folder
 app.static_url_path="/react/build/static"
