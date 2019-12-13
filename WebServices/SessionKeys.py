@@ -1,0 +1,1 @@
+LOBBY_SESSION_KEY = "lobby"

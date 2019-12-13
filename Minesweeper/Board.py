@@ -173,6 +173,10 @@ class Board:
 
     def click(self, row, col):
 
+        # prevent first click on mine
+        if self.is_board_empty(): # first click
+            self.move_mine_from_cell_if_exists(row, col)
+
         if self.get_game_status() != GAME_NOT_FINISHED:
             return
 
@@ -226,14 +230,45 @@ class Board:
         current_mines = 0
 
         while current_mines < mines_to_place:
-            row = random.randint(0, self.rows - 1)
-            col = random.randint(0, self.cols - 1)
-
-            self.get_cell(row, col).has_mine = True
-
+            self.place_single_mine_random()
             current_mines = current_mines + 1
 
         print("\nplaced {} mines on board\n".format(current_mines))
+
+    def place_single_mine_random(self):
+        row = random.randint(0, self.rows - 1)
+        col = random.randint(0, self.cols - 1)
+
+        cell = self.get_cell(row, col)
+
+        # if random chosen cell already has a mine then choose a different cell
+        if not cell.has_mine:
+            cell.has_mine = True
+
+        else:
+            self.place_single_mine_random()
+
+    # check if cell has mine and if it does move the mine to other empty place
+    def move_mine_from_cell_if_exists(self, row, col):
+        cell = self.get_cell(row, col)
+
+        # need the while because it might place it on same cell
+        while cell.has_mine:
+            cell.has_mine = False
+            self.place_single_mine_random() # might place it on same cell so need to check
+
+    # returns true if no move was made yet
+    def is_board_empty(self):
+        is_empty = True
+
+        for i in range(self.rows):
+            for j in range(self.cols):
+                cell = self.cells[i][j]
+
+                if cell.clicked:
+                    is_empty = False
+
+        return is_empty
 
     def finish_game(self, mine=False, won=False):
 

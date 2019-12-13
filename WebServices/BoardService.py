@@ -1,10 +1,12 @@
-from flask import request
-from flask_restful import Resource, reqparse
+from flask import request, session
+from flask_restful import Resource
 import traceback
 
+from WebServices.SessionKeys import LOBBY_SESSION_KEY
 
 MIN_BOARD_SIZE = 7
 MAX_BOARD_SIZE = 24
+NO_LOBBY_ERROR_MSG = {"errorMsg": "no lobby set", "lobbyError": True}
 
 class Fetch(Resource):
 
@@ -12,7 +14,12 @@ class Fetch(Resource):
         self.gameManager = gameManager
 
     def get(self):
-        return self.gameManager.get_board_with_status()
+        lobby_key = session.get(LOBBY_SESSION_KEY)
+
+        if lobby_key is None:
+            return NO_LOBBY_ERROR_MSG
+
+        return self.gameManager.get_board_with_status(lobby_key)
 
 
 class DifficultyRange(Resource):
@@ -42,7 +49,13 @@ class Click(Resource):
         col = int(body["col"])
         row = int(body["row"])
 
-        self.gameManager.click(row, col)
+        # get lobby key from session
+        lobby_key = session.get(LOBBY_SESSION_KEY)
+
+        if lobby_key is None:
+            return NO_LOBBY_ERROR_MSG
+
+        self.gameManager.click(lobby_key, row, col)
 
         return {"msg": "clicked"}
 
@@ -65,7 +78,13 @@ class Flag(Resource):
         col = int(body["col"])
         row = int(body["row"])
 
-        self.gameManager.flag_click(row, col)
+        # get lobby key from session
+        lobby_key = session.get(LOBBY_SESSION_KEY)
+
+        if lobby_key is None:
+            return NO_LOBBY_ERROR_MSG
+
+        self.gameManager.flag_click(lobby_key, row, col)
 
         return {"msg": "flag clicked"}
 
@@ -95,8 +114,14 @@ class Reset(Resource):
         if rows > MAX_BOARD_SIZE or cols > MAX_BOARD_SIZE:
             return {"errorMsg": "Board size must be smaller than {}".format(MAX_BOARD_SIZE)}
 
+        # get lobby key from session
+        lobby_key = session.get(LOBBY_SESSION_KEY)
+
+        if lobby_key is None:
+            return NO_LOBBY_ERROR_MSG
+
         # reset the game
-        self.gameManager.reset_game(rows=rows, cols=cols, mine_probability=difficulty)
+        self.gameManager.reset_game(lobby_key, rows=rows, cols=cols, mine_probability=difficulty)
 
         return {"msg": "board reset"}
 

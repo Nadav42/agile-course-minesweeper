@@ -160,3 +160,30 @@ body {
   background: #4CAF50;
   cursor: pointer;
 }
+
+.lobbies-list {
+  height: 175px;
+  overflow: auto;
+}
+
+.lobby-icon {
+  width: 24px;
+  margin-right: 8px;
+  display: inline-block;
+  text-align: center;
+}
+
+.span-link {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.span-link:hover {
+  text-decoration: underline;
+}
+
+.lobby-form {
+  width: 100%;
+  max-width: 560px;
+}
