@@ -3,6 +3,7 @@ from flask_restful import Resource
 import traceback
 
 from WebServices.SessionKeys import LOBBY_SESSION_KEY
+from WebServices.Headers import NO_CACHE_HEADERS
 
 MIN_BOARD_SIZE = 7
 MAX_BOARD_SIZE = 24
@@ -19,7 +20,7 @@ class Fetch(Resource):
         if lobby_key is None:
             return NO_LOBBY_ERROR_MSG
 
-        return self.gameManager.get_board_with_status(lobby_key)
+        return self.gameManager.get_board_with_status(lobby_key), 200, NO_CACHE_HEADERS
 
 
 class DifficultyRange(Resource):
