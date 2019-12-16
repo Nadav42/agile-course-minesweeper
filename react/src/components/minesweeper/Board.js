@@ -356,11 +356,11 @@ class Board extends React.Component {
                     <div className="row text-center mt-3 mb-3">
                         <div className="col-6">
                             <label>Rows</label>
-                            <input type="text" className="form-control" value={this.state.rows} onChange={this.handleRowsColsInputChange} />
+                            <input type="number" className="form-control" value={this.state.rows} onChange={this.handleRowsColsInputChange} />
                         </div>
                         <div className="col-6">
                             <label>Cols</label>
-                            <input type="text" className="form-control" value={this.state.cols} onChange={this.handleRowsColsInputChange} />
+                            <input type="number" className="form-control" value={this.state.cols} onChange={this.handleRowsColsInputChange} />
                         </div>
                     </div>
 
