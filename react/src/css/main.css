@@ -166,11 +166,21 @@ body {
   overflow: auto;
 }
 
+.lobby-open {
+  border-left: solid 5px lightskyblue;
+}
+
+.lobby-closed {
+  border-left: solid 5px #fad787;
+}
+
 .lobby-icon {
   width: 24px;
   margin-right: 8px;
   display: inline-block;
   text-align: center;
+
+  color: #5f5f5f;
 }
 
 .span-link {
@@ -186,4 +196,9 @@ body {
 .lobby-form {
   width: 100%;
   max-width: 560px;
+}
+
+.title {
+  font-size: 40px !important;
+  font-weight: 300;
 }

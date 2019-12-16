@@ -1,6 +1,8 @@
 import React from "react";
 
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Router, Switch, Route } from "react-router-dom";
+import { createBrowserHistory } from 'history';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -12,15 +14,15 @@ import './css/main.css'
 // Call it once in your app. At the root of your app is the best place
 toast.configure()
 
-function LobbiesRoute() {
+function LobbiesRoute(props) {
 	return (
 		<div>
 			<div className="mb-5"></div>
 			<div className="container text-center">
-				<h1>Lobbies</h1>
+				<h1 className="title">Lobbies</h1>
 			</div>
 			<div className="container text-center mx-auto">
-				<LobbiesPanel />
+				<LobbiesPanel history={props.history} />
 			</div>
 		</div>
 	);
@@ -31,7 +33,7 @@ function BoardRoute() {
 		<div>
 			<div className="mb-5"></div>
 			<div className="container text-center">
-				<h1>Minesweeper</h1>
+				<h1 className="title">Minesweeper</h1>
 			</div>
 			<div className="container text-center mx-auto">
 				<Board />
@@ -42,17 +44,23 @@ function BoardRoute() {
 
 // App
 class App extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		this.history = createBrowserHistory();
+	}
 	
 	render() {
 		return (
-			<Router>
+			<Router history={this.history}>
 				<div>
 					<Switch>
 						<Route path="/game">
 							<BoardRoute />
 						</Route>
 						<Route path="/">
-							<LobbiesRoute />
+							<LobbiesRoute history={this.history}/>
 						</Route>
 					</Switch>
 				</div>

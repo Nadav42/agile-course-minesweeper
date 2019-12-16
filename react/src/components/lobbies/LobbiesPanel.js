@@ -1,4 +1,6 @@
 import React from 'react';
+import { toast } from 'react-toastify';
+
 import socketIOClient from "socket.io-client";
 
 import { socket_host, getLobbiesList, postJoinLobby, postJoinLobbyWithPassword, postCreateLobby } from '../../api/rest_api'
@@ -13,7 +15,7 @@ function LobbiesTable(props) {
     let lobbiesElements = lobbies.map(lobby => {
         if (lobby.hasPassword) {
             return (
-                <tr key={lobby.key}>
+                <tr key={lobby.key} className="lobby-closed">
                     <td className="text-left">
                         <span className="lobby-icon"><i className="fas fa-lock"></i></span>
                         <span>{lobby.name}</span>
@@ -26,7 +28,7 @@ function LobbiesTable(props) {
         }
         else {
             return (
-                <tr key={lobby.key}>
+                <tr key={lobby.key} className="lobby-open">
                     <td className="text-left">
                         <span className="lobby-icon"><i className="fas fa-door-open"></i></span>
                         <span>{lobby.name}</span>
@@ -55,6 +57,10 @@ function PasswordModal(props) {
         <div className="modal fade" id="passwordModal" tabIndex="-1" role="dialog">
             <div className="modal-dialog" role="document">
                 <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title">Lobby requires password</h5>
+                        <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                    </div>
                     <div className="modal-body">
                         <div className="form-group text-left">
                             <label>Password</label>
@@ -62,7 +68,6 @@ function PasswordModal(props) {
                         </div>
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="button" className="btn btn-primary" onClick={props.handleJoinLobbyWithPassword} data-dismiss="modal">Join</button>
                     </div>
                 </div>
@@ -97,7 +102,8 @@ class LobbiesPanel extends React.Component {
 
     handleJoinLobby = (lobbyKey) => {
         postJoinLobby(lobbyKey, () => {
-            window.location.href = "/game";
+            toast.success("Joined Lobby", {autoClose: 2750});
+            this.props.history.push("/game");
         });
     }
 
@@ -105,18 +111,20 @@ class LobbiesPanel extends React.Component {
         let lobbyKey = this.state.passwordModalLobbyKey;
         let password = this.state.modalPassword;
 
-        if (!lobbyKey || !password) {
+        if (!lobbyKey) {
             return;
         }
 
         postJoinLobbyWithPassword(lobbyKey, password, () => {
-            window.location.href = "/game";
+            toast.success("Joined Lobby", {autoClose: 2750});
+            this.props.history.push("/game");
         });
     }
 
     handleCreateLobby = () => {
         postCreateLobby(this.state.lobbyName, this.state.lobbyPassword, () => {
-            window.location.href = "/game";
+            toast.success("Created Lobby", {autoClose: 2750});
+            this.props.history.push("/game");
         });
     }
 
@@ -153,7 +161,7 @@ class LobbiesPanel extends React.Component {
                         <input type="password" className="form-control" placeholder="Optional (leave empty)" value={this.state.lobbyPassword} onChange={this.handleLobbyCreatePasswordChange} />
                     </div>
                     <div className="text-center">
-                        <button type="button" className="btn btn-primary" onClick={this.handleCreateLobby}>Create Lobby</button>
+                        <button type="button" className="btn btn-success" onClick={this.handleCreateLobby}>Create Lobby</button>
                     </div>
                 </div>
 
