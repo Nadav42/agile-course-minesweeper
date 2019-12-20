@@ -9,6 +9,12 @@ class TestBoardService(unittest.TestCase):
         app.testing = True
         self.app = app.test_client()
 
+    # post request testing:
+    # https://stackoverflow.com/questions/7428124/how-can-i-fake-request-post-and-get-params-for-unit-testing-in-flask
+
+    # self.app.post('/path-to-request', data=dict(var1='data1', var2='data2', ...))
+
+
     def test_board_fetch(self):
         with self.app as client:
             response = self.app.get('/api/lobby/list')
