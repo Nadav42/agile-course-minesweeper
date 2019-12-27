@@ -1,0 +1,16 @@
+### .dockerignore guide: https://codefresh.io/docker-tutorial/not-ignore-dockerignore-2/ ###
+
+# ignore all *.class files in all folders, including build root
+# **/*.class
+
+# ignore all node_modules folders anywhere
+# **/node_modules
+
+# ignore nested
+**/node_modules
+
+# ignore root
+.idea
+__pycache__
+venv
+flask_session
