@@ -102,7 +102,6 @@ class LobbiesPanel extends React.Component {
 
     handleJoinLobby = (lobbyKey) => {
         postJoinLobby(lobbyKey, () => {
-            toast.success("Joined Lobby", {autoClose: 2750});
             this.props.history.push("/game");
         });
     }
@@ -116,14 +115,13 @@ class LobbiesPanel extends React.Component {
         }
 
         postJoinLobbyWithPassword(lobbyKey, password, () => {
-            toast.success("Joined Lobby", {autoClose: 2750});
             this.props.history.push("/game");
         });
     }
 
     handleCreateLobby = () => {
         postCreateLobby(this.state.lobbyName, this.state.lobbyPassword, () => {
-            toast.success("Created Lobby", {autoClose: 2750});
+            toast.success(`Created Lobby "${this.state.lobbyName}"`, {autoClose: 2750});
             this.props.history.push("/game");
         });
     }
