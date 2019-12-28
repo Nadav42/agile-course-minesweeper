@@ -1,8 +1,8 @@
 import unittest
 from flask_app import app
 
-from WebServices.SessionKeys import LOBBY_SESSION_KEY
-
+# from WebServices.SessionKeys import LOBBY_SESSION_KEY
+from WebServices.BoardService import *
 class TestBoardService(unittest.TestCase):
 
     def setUp(self):
@@ -13,8 +13,6 @@ class TestBoardService(unittest.TestCase):
     # https://stackoverflow.com/questions/7428124/how-can-i-fake-request-post-and-get-params-for-unit-testing-in-flask
 
     # self.app.post('/path-to-request', data=dict(var1='data1', var2='data2', ...))
-
-
     def test_board_fetch(self):
         with self.app as client:
             response = self.app.get('/api/lobby/list')
@@ -29,6 +27,11 @@ class TestBoardService(unittest.TestCase):
             response = response.json
 
             # Make your assertions
+            self.assertGreaterEqual(response['difficulty'],0.13)
+            if (response['won'] == True):
+                {
+                    self.assertTrue(response['finished'])
+                }
             print(response)
 
 if __name__ == '__main__':
