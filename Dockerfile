@@ -9,8 +9,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 # install and cache app dependencies
 COPY ./react/package.json /app/package.json
 
-RUN npm install --silent
-RUN npm install react-scripts@3.0.1 -g --silent
+RUN npm install && npm install react-scripts@3.0.1 -g && npm cache clean --force
 
 COPY ./react/src /app/src
 COPY ./react/public /app/public
@@ -18,21 +17,17 @@ COPY ./react/public /app/public
 # for builds use RUN, not CMD!
 RUN npm run build
 
-# ----- then setup the flask server ----- #
+# ----- then install and start the flask server ----- #
 FROM python:3.7.3-alpine3.10
-
-# We copy just the requirements.txt first to leverage Docker cache (?????)
-COPY ./requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
 # install build dependencies like gcc then install pip requirements
-# if no need for special build dependencies just --> RUN pip install -r requirements.txt
-RUN apk --update add python py-pip openssl ca-certificates py-openssl wget
-RUN apk --update add --virtual build-dependencies libffi-dev openssl-dev python-dev py-pip build-base \
-  && pip install --upgrade pip \
-  && pip install -r requirements.txt \
-  && apk del build-dependencies
+RUN apk add --no-cache gcc musl-dev linux-headers
+
+COPY ./requirements.txt /app/requirements.txt
+
+RUN pip install -r requirements.txt
 
 # copy python source code
 COPY . /app
@@ -43,6 +38,6 @@ RUN rm -rf /app/react
 # copy build folder from docker react build stage
 COPY --from=react-builder /app/build/ /app/react/build/
 
-ENTRYPOINT [ "python" ]
+EXPOSE 5000
 
-CMD [ "flask_app.py" ]
+CMD ["python", "-u", "/app/flask_app.py"]

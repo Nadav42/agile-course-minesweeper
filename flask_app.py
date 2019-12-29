@@ -1,7 +1,5 @@
 import os
-
-# import eventlet
-# eventlet.monkey_patch()
+import redis
 
 from flask import Flask, request, send_from_directory
 from flask_restful import Api
@@ -18,8 +16,20 @@ app = Flask(__name__)
 # ----- config ----- #
 
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
-app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SECRET_KEY'] = 'Az5Jf$y1cSt'
+
+# set session type as redis if available, use filesystem otherwise.
+try:
+    redis_server = redis.Redis(host='redis', port=6379) # redis:6379 is DNS for the docker-compose redis service
+    redis_server.ping() # will throw an error if can't connect to redis
+
+    app.config['SESSION_TYPE'] = "redis"
+    app.config['SESSION_REDIS'] = redis_server
+
+except:
+    app.config['SESSION_TYPE'] = 'filesystem'
+
+print("SESSION_TYPE={}".format(app.config['SESSION_TYPE']))
 
 # ------------------ #
 
