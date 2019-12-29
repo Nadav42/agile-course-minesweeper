@@ -27,11 +27,11 @@ class TestBoardService(unittest.TestCase):
             response = response.json
 
             # Make your assertions
-            self.assertGreaterEqual(response['difficulty'],0.13)
-            if (response['won'] == True):
-                {
-                    self.assertTrue(response['finished'])
-                }
+            self.assertGreaterEqual(response['difficulty'], 0.13)
+
+            if response['won'] == True:
+                self.assertTrue(response['finished'])
+
             print(response)
 
 if __name__ == '__main__':

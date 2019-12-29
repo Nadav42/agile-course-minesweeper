@@ -140,7 +140,7 @@ class Board:
         self.rows = rows
         self.cols = cols
         self.mine_probability = mine_probability
-        self.game_over = GAME_NOT_FINISHED
+        self.game_status = GAME_NOT_FINISHED
 
         # cell objects
         self.cells = [[0 for col in range(self.cols)] for row in range(self.rows)]
@@ -273,15 +273,15 @@ class Board:
     def finish_game(self, mine=False, won=False):
 
         if mine:
-            self.game_over = GAME_LOST
+            self.game_status = GAME_LOST
             print("game over! you lose")
 
         if won:
-            self.game_over = GAME_WON
+            self.game_status = GAME_WON
             print("you win!")
 
     def get_game_status(self):
-        return self.game_over
+        return self.game_status
 
     def get_difficulty(self):
         return self.mine_probability
