@@ -1,0 +1,12 @@
+version: "3"
+services:
+  flask:
+    image: "nadav42/minesweeper"
+    depends_on:
+      - redis
+    ports:
+      - "5000:5000"
+    restart: "always"
+  redis:
+    image: "redis:alpine3.11"
+    restart: "always"
