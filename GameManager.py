@@ -1,4 +1,5 @@
 import hashlib
+import os
 
 from Minesweeper.Board import Board, GAME_NOT_FINISHED, GAME_WON, GAME_LOST, MIN_DIFFICULTY, MAX_DIFFICULTY
 
@@ -7,21 +8,23 @@ def md5(value):
     m.update(str(value).encode('utf-8'))
     return m.hexdigest()
 
+def sha_encrypt(password, salt):
+    return hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 250000)
+
+
 class Lobby:
 
     lobby_generated_id = 1
 
     def __init__(self, lobby_name, password=None):
         self.lobby_name = lobby_name
-        self.lobby_key = md5(Lobby.lobby_generated_id)
+        self.lobby_key = md5(Lobby.lobby_generated_id) # unique id
 
-        # encrypt password if not none (TODO: md5 is not safe for passwords, change this in the future)
-        if password is not None:
-            password = md5(password)
+        # lobby password
+        self.salt = os.urandom(32)  # save random salt for this lobby
+        self.password_encrypted = self.encrypt_password(password, self.salt)  # only store the encrypted password
 
-        # store only encrypted password
-        self.password_encrypted = password
-
+        # lobby board instance
         self.board = Board()
 
         # next id
@@ -36,9 +39,15 @@ class Lobby:
     def has_password(self):
         return (self.password_encrypted is not None)
 
-    # TODO: change from md5 to more secure hash
+    def encrypt_password(self, password, salt):
+        if password is not None:
+            return sha_encrypt(password, salt)
+
+        # lobby has no password
+        return password
+
     def check_password_correct(self, password):
-        return (md5(password) == self.password_encrypted)
+        return sha_encrypt(password, self.salt) == self.password_encrypted
 
     def to_json(self):
         return {"key": self.lobby_key, "name": self.lobby_name, "hasPassword": (self.password_encrypted is not None)}
