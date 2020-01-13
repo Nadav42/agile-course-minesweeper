@@ -1,6 +1,8 @@
 import unittest
 from flask_app import app
 
+# integration tests --> not in scope
+
 # from WebServices.SessionKeys import LOBBY_SESSION_KEY
 from WebServices.BoardService import *
 class TestBoardService(unittest.TestCase):

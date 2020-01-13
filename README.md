@@ -1,5 +1,5 @@
 # Minesweeper
-minesweeper app made with Flask and React
+multiplayer minesweeper app made with Flask, React and Socket.IO
 
 ## Run tests
 `python -m unittest discover ./tests`

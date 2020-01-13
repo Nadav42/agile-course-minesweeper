@@ -46,7 +46,7 @@ app.static_folder=app.root_path + app.static_url_path
 print("changed flask static folder to:", app.static_url_path)
 
 # init GameManager
-gameManager = GameManager()
+gameManager = GameManager(demo=True)
 
 # add flask routes and endpoints in Routing
 Routing(app, api, socketio, gameManager)
