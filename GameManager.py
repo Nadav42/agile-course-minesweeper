@@ -54,12 +54,13 @@ class Lobby:
 
 class GameManager:
 
-    def __init__(self):
+    def __init__(self, demo=False):
         self.lobbies = {}
 
-        self.create_lobby("Demo Lobby3", password="1234")
-        self.create_lobby("Demo Lobby2")
-        self.create_lobby("Demo Lobby1")
+        if demo:
+            self.create_lobby("Demo Lobby3", password="1234")
+            self.create_lobby("Demo Lobby2")
+            self.create_lobby("Demo Lobby1")
 
     def get_board_with_status(self, lobby_key):
         board = self.get_lobby(lobby_key).get_board()

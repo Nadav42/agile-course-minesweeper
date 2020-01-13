@@ -1,5 +1,6 @@
 import unittest
 import random
+import json
 
 from Minesweeper.Board import Board, MIN_DIFFICULTY, MAX_DIFFICULTY, GAME_NOT_FINISHED, GAME_LOST, GAME_WON
 
@@ -82,6 +83,22 @@ class BoardTests(unittest.TestCase):
 
         board.click(random.randint(0, 6), random.randint(0, 6))
         self.assertFalse(board.is_board_empty())
+
+    # when I do illegal action nothing happens because the action is invalid
+    def test_illegal_click(self):
+        board = Board()
+
+        board.flag_click(0, 0) # valid
+        state1 = json.dumps(board.to_json())
+
+        board.flag_click(100, 100) # invalid
+        state2 = json.dumps(board.to_json())
+
+        board.flag_click(8, 8)  # valid
+        state3 = json.dumps(board.to_json())
+
+        self.assertEqual(state1, state2) # action 2 did not change board
+        self.assertNotEqual(state1, state3) # action 3 changed the board
 
 
 if __name__ == '__main__':
