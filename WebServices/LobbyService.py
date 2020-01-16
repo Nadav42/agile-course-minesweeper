@@ -72,8 +72,12 @@ class CreateLobby(Resource):
             password = None
 
         # validate name okay
-        if len(lobby_name) < 3:
+        if len(lobby_name.strip().replace(" ", "")) < 3:
             return {"errorMsg": "Lobby name is too short"}
+
+        # check password not too short
+        if password is not None and len(password.strip().replace(" ", "")) < 4:
+            return {"errorMsg": "Password is too short"}
 
         # create lobby and join it
         lobby_key = self.gameManager.create_lobby(lobby_name, password=password)

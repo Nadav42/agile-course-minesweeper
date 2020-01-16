@@ -47,7 +47,7 @@ function CellNumber(props) {
 
     return (
         <div className="game-cell">
-            <span className={`cell-value ${numberClass}`}>{props.number}</span>
+            <span className={`cell-value ${numberClass} unselectable`}>{props.number}</span>
         </div>
     );
 }
