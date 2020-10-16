@@ -1,5 +1,9 @@
-# Minesweeper
+# Minesweeper - final assignment for Agile Course 10346
 multiplayer minesweeper app made with Flask, React and Socket.IO
+
+https://github.com/Nadav42/agile-course-minesweeper
+
+https://hub.docker.com/r/nadav42/minesweeper
 
 ## Install from source code
 1. install all dependencies
